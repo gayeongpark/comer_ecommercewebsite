@@ -1,7 +1,7 @@
 import React from 'react';
 import Signup from '../components/Auth/Signup';
 
-export default function Auth() {
+export default function AuthSignUp() {
     return (
         <div>
             <Signup/>

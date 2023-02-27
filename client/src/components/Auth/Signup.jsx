@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useForm } from 'react-hook-form';
 import AuthNav from './AuthNav';
+import { Link } from 'react-router-dom';
+import { login } from '../../api/firebase';
 
 export default function Signup() {
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
+  console.log(watch('email'));
+  const password = useRef();
+  password.current = watch('password');
+  const onSubmit = async (data) => {
+    await login(data.email, data.password);
+    reset();
+  };
   return (
     <div>
       <AuthNav />
@@ -15,10 +32,11 @@ export default function Signup() {
           </p>
           <button
             type='button'
-            class='mt-8 w-full justify-center text-white bg-red-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-semibold rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mr-2 mb-2'
+            className='mt-8 w-full justify-center text-white bg-red-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-semibold rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mr-2 mb-2'
+            onClick={() => login()}
           >
             <svg
-              class='w-4 h-4 mr-2 -ml-1'
+              className='w-4 h-4 mr-2 -ml-1'
               aria-hidden='true'
               focusable='false'
               data-prefix='fab'
@@ -36,43 +54,13 @@ export default function Signup() {
           </button>
           <p className='mt-5'>or</p>
         </div>
-        <form className='mx-auto mt-5 max-w-xl sm:mt-5'>
+
+        <form
+          className='mx-auto mt-5 max-w-xl sm:mt-5'
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className='grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2'>
-            <div>
-              <label
-                htmlFor='first-name'
-                className='block text-sm font-semibold leading-6 text-gray-900'
-              >
-                First name
-              </label>
-              <div className='mt-2.5'>
-                <input
-                  type='text'
-                  name='first-name'
-                  id='first-name'
-                  autoComplete='given-name'
-                  className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
-                />
-              </div>
-            </div>
-            <div>
-              <label
-                htmlFor='last-name'
-                className='block text-sm font-semibold leading-6 text-gray-900'
-              >
-                Last name
-              </label>
-              <div className='mt-2.5'>
-                <input
-                  type='text'
-                  name='last-name'
-                  id='last-name'
-                  autoComplete='family-name'
-                  className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
-                />
-              </div>
-            </div>
-            <div className='sm:col-span-2'>
+            <div className='sm:col-span-2' id='email'>
               <label
                 htmlFor='email'
                 className='block text-sm font-semibold leading-6 text-gray-900'
@@ -81,29 +69,69 @@ export default function Signup() {
               </label>
               <div className='mt-2.5'>
                 <input
+                  {...register('email', {
+                    required: true,
+                    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  })}
                   type='email'
                   name='email'
                   id='email'
-                  autoComplete='email'
+                  autoComplete='off'
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
+                {errors.email && <div>* Email is required</div>}
               </div>
             </div>
-            <div className='sm:col-span-2'>
-              <label
-                htmlFor='email'
-                className='block text-sm font-semibold leading-6 text-gray-900'
-              >
+            <div className='sm:col-span-2' id='password'>
+              <label className='block text-sm font-semibold leading-6 text-gray-900'>
                 Password
               </label>
               <div className='mt-2.5'>
                 <input
+                  {...register('password', {
+                    required: true,
+                    minLength: 6,
+                  })}
                   type='password'
                   name='password'
                   id='password'
                   autoComplete='false'
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
+                {errors.password && errors.password.type === 'required' && (
+                  <div>* Password is required</div>
+                )}
+                {errors.password && errors.password.type === 'minLength' && (
+                  <div>* Password should contain at least 6 characters</div>
+                )}
+              </div>
+            </div>
+            <div className='sm:col-span-2' id='password-confirmation'>
+              <label className='block text-sm font-semibold leading-6 text-gray-900'>
+                Password confirmation
+              </label>
+              <div className='mt-2.5'>
+                <input
+                  {...register('password_confirmation', {
+                    required: true,
+                    validate: (value) => value === password.current,
+                  })}
+                  type='password'
+                  name='password_confirmation'
+                  id='password_confirmation'
+                  autoComplete='false'
+                  className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
+                />
+                {errors.password_confirmation &&
+                  errors.password_confirmation.type === 'required' && (
+                    <div>* Password confirmation is required</div>
+                  )}
+                {errors.password_confirmation &&
+                  errors.password_confirmation.type === 'validate' && (
+                    <div>
+                      * Password does not match width password confirmation
+                    </div>
+                  )}
               </div>
             </div>
           </div>
@@ -116,7 +144,10 @@ export default function Signup() {
             </button>
             <div className='mx-auto max-w-2xl text-center'>
               <p className='mt-8 text-md leading-8 text-gray-600'>
-                Alreay have an account? <button>Log in</button>
+                Alreay have an account?{' '}
+                <Link to='/login'>
+                  <button>Log in</button>
+                </Link>
               </p>
             </div>
           </div>

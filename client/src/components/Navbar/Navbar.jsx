@@ -1,14 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@gmail.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-};
 
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -22,6 +16,7 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
+  const [user, setUser] = useState();
   return (
     <>
       <div className='min-h-full'>
@@ -59,7 +54,7 @@ export default function Navbar() {
                             <span className='sr-only'>Open user menu</span>
                             <img
                               className='h-8 w-8 rounded-full'
-                              src={user.imageUrl}
+                              src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
                               alt=''
                             />
                           </Menu.Button>
@@ -74,6 +69,32 @@ export default function Navbar() {
                           leaveTo='transform opacity-0 scale-95'
                         >
                           <Menu.Items className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                            {!user && <Menu.Item>
+                              {({ active }) => (
+                                <Link to='/login'><div
+                                  href='#'
+                                  className={classNames(
+                                    active ? 'bg-gray-100' : '',
+                                    'block px-4 py-2 text-sm text-gray-700'
+                                  )}
+                                >
+                                  Log in
+                                </div></Link>
+                              )}
+                            </Menu.Item>}
+                            {user &&<Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  href='#'
+                                  className={classNames(
+                                    active ? 'bg-gray-100' : '',
+                                    'block px-4 py-2 text-sm text-gray-700'
+                                  )}
+                                >
+                                  Log out
+                                </div>
+                              )}
+                            </Menu.Item>}
                             <Menu.Item>
                               {({ active }) => (
                                 <div
@@ -95,20 +116,7 @@ export default function Navbar() {
                                     active ? 'bg-gray-100' : '',
                                     'block px-4 py-2 text-sm text-gray-700'
                                   )}
-                                >
-                                  Settings
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  href='#'
-                                  className={classNames(
-                                    active ? 'bg-gray-100' : '',
-                                    'block px-4 py-2 text-sm text-gray-700'
-                                  )}
-                                ></div>
+                                >Settings</div>
                               )}
                             </Menu.Item>
                             <Menu.Item>
@@ -155,16 +163,13 @@ export default function Navbar() {
                     <div className='flex-shrink-0'>
                       <img
                         className='h-10 w-10 rounded-full'
-                        src={user.imageUrl}
+                        src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
                         alt=''
                       />
                     </div>
                     <div className='ml-3'>
-                      <div className='text-base font-medium leading-none text-white'>
-                        {user.name}
-                      </div>
                       <div className='text-sm font-medium leading-none text-gray-400'>
-                        {user.email}
+                        Lantana93@park.com
                       </div>
                     </div>
                     <button

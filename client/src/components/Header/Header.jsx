@@ -82,19 +82,15 @@ export default function Header() {
                   </div>
                 </div>
               </div>
-              <div className='flex relative justify-between pl-10 p-2 text-center w-3/5 h-auto shadow-md shadow-gray-400 bg-white border rounded-full'>
-                <div className='flex justify-between'>
-                <button class>Place</button>
+              <div className='flex relative justify-between px-4 pl-5 py-1 items-center text-center h-auto w-3/5 h-auto shadow-md shadow-gray-400 bg-white border rounded-full'>
+                <div className='text-lg'>Place</div>
+                <div className='flex items-center border-l border-gray-300'></div>
+                <div className='text-lg'>Period</div>
                 <div className='border-l border-gray-300'></div>
-                <button>Period</button>
-                <div className='border-l border-gray-300'></div>
-                <button>People</button>
-                </div>
-                <div className='flex'>
-                  <button className='flex bg-red-700 p-4 flex-row-reverse rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2'>
-                    <GoSearch className='text-white font-bold text-xl' />
-                  </button>
-                </div>
+                <div className='text-lg'>People</div>
+                <button className='flex bg-red-700 p-4 flex-row-reverse rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2'>
+                  <GoSearch className='text-white font-bold text-xl' />
+                </button>
               </div>
             </div>
           </div>
