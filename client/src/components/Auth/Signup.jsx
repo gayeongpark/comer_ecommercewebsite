@@ -1,24 +1,32 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../api/firebase';
 import AuthNav from './AuthNav';
 import { Link } from 'react-router-dom';
-import { login } from '../../api/firebase';
+import { BiShow } from 'react-icons/bi';
+import { BiHide } from 'react-icons/bi';
+import { loginGoogle } from '../../api/firebase';
 
 export default function Signup() {
+  const [user, loading] = useAuthState(auth);
+  const [open, setOpen] = useState(false);
+  const toggle = () => {
+    setOpen(!open);
+  };
   const {
     register,
     watch,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm();
   console.log(watch('email'));
   const password = useRef();
   password.current = watch('password');
-  const onSubmit = async (data) => {
-    await login(data.email, data.password);
-    reset();
+  const onSubmit = (data) => {
+    console.log('data', data);
   };
+
   return (
     <div>
       <AuthNav />
@@ -30,31 +38,35 @@ export default function Signup() {
           <p className='mt-2 text-lg leading-8 text-gray-600'>
             Explore thousands of experiences and make friends as a member.
           </p>
-          <button
-            type='button'
-            className='mt-8 w-full justify-center text-white bg-red-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-semibold rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mr-2 mb-2'
-            onClick={() => login()}
-          >
-            <svg
-              className='w-4 h-4 mr-2 -ml-1'
-              aria-hidden='true'
-              focusable='false'
-              data-prefix='fab'
-              data-icon='google'
-              role='img'
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 488 512'
-            >
-              <path
-                fill='currentColor'
-                d='M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z'
-              ></path>
-            </svg>
-            Sign up with Google
-          </button>
+          {user && (
+            <Link to='/'>
+              <button
+                type='button'
+                className='mt-8 w-full justify-center text-white bg-red-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-semibold rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mr-2 mb-2'
+                onClick={() => loginGoogle()}
+              >
+                <svg
+                  className='w-4 h-4 mr-2 -ml-1'
+                  aria-hidden='true'
+                  focusable='false'
+                  data-prefix='fab'
+                  data-icon='google'
+                  role='img'
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 488 512'
+                >
+                  <path
+                    fill='currentColor'
+                    d='M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z'
+                  ></path>
+                </svg>
+                Sign up with Google
+              </button>
+            </Link>
+          )}
+
           <p className='mt-5'>or</p>
         </div>
-
         <form
           className='mx-auto mt-5 max-w-xl sm:mt-5'
           onSubmit={handleSubmit(onSubmit)}
@@ -86,18 +98,26 @@ export default function Signup() {
               <label className='block text-sm font-semibold leading-6 text-gray-900'>
                 Password
               </label>
-              <div className='mt-2.5'>
+              <div className='relative mt-2.5'>
                 <input
                   {...register('password', {
                     required: true,
                     minLength: 6,
                   })}
-                  type='password'
+                  type={open === false ? 'password' : 'text'}
                   name='password'
                   id='password'
                   autoComplete='false'
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
+
+                <div className='text-2xl absolute top-2 right-5 text-gray-300'>
+                  {open === false ? (
+                    <BiHide onClick={toggle} />
+                  ) : (
+                    <BiShow className='text-gray-900' onClick={toggle} />
+                  )}
+                </div>
                 {errors.password && errors.password.type === 'required' && (
                   <div>* Password is required</div>
                 )}
@@ -110,18 +130,25 @@ export default function Signup() {
               <label className='block text-sm font-semibold leading-6 text-gray-900'>
                 Password confirmation
               </label>
-              <div className='mt-2.5'>
+              <div className='relative mt-2.5'>
                 <input
                   {...register('password_confirmation', {
                     required: true,
                     validate: (value) => value === password.current,
                   })}
-                  type='password'
+                  type={open === false ? 'password' : 'text'}
                   name='password_confirmation'
                   id='password_confirmation'
                   autoComplete='false'
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
+                <div className='text-2xl absolute top-2 right-5 text-gray-300'>
+                  {open === false ? (
+                    <BiHide onClick={toggle} />
+                  ) : (
+                    <BiShow className='text-gray-900' onClick={toggle} />
+                  )}
+                </div>
                 {errors.password_confirmation &&
                   errors.password_confirmation.type === 'required' && (
                     <div>* Password confirmation is required</div>
@@ -129,7 +156,7 @@ export default function Signup() {
                 {errors.password_confirmation &&
                   errors.password_confirmation.type === 'validate' && (
                     <div>
-                      * Password does not match width password confirmation
+                      * Password does not match with password confirmation
                     </div>
                   )}
               </div>

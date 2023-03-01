@@ -1,13 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthNav from './AuthNav';
-import { login } from '../../api/firebase';
+import { loginGoogle } from '../../api/firebase';
+import { BiShow } from 'react-icons/bi';
+import { BiHide } from 'react-icons/bi';
 
 export default function Login() {
-    const [user, setUser] = useState();
-    const handleLogin = () => {
-        login().then(user => setUser)
-    }
+  const [open, setOpen] = useState(false);
+  const toggle = () => {
+    setOpen(!open);
+  };
   return (
     <div>
       <div>
@@ -23,7 +25,7 @@ export default function Login() {
             <button
               type='button'
               className='mt-8 w-full justify-center text-white bg-red-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-semibold rounded-md text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mr-2 mb-2'
-              onClick={handleLogin}
+              onClick={() => loginGoogle()}
             >
               <svg
                 className='w-4 h-4 mr-2 -ml-1'
@@ -68,14 +70,21 @@ export default function Login() {
                 <label className='block text-sm font-semibold leading-6 text-gray-900'>
                   Password
                 </label>
-                <div className='mt-2.5'>
+                <div className='relative mt-2.5'>
                   <input
-                    type='password'
+                    type={open === false ? 'password' : 'text'}
                     name='password'
                     id='password'
                     autoComplete='false'
                     className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                   />
+                  <div className='text-2xl absolute top-2 right-5 text-gray-300'>
+                    {open === false ? (
+                      <BiHide onClick={toggle} />
+                    ) : (
+                      <BiShow className='text-gray-900' onClick={toggle} />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

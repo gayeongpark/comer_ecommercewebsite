@@ -18,9 +18,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
+export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-export async function login() {
+
+export async function loginGoogle() {
   return signInWithPopup(auth, provider)
     .then((result) => {
       const user = result.user;
@@ -30,7 +31,7 @@ export async function login() {
     .catch(console.error);
 }
 
-export async function logout() {
+export async function logoutGoogle() {
   return signOut(auth)
     .then(() => null)
     .catch((error) => {});
