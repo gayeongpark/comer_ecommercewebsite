@@ -2,11 +2,32 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser())
+
+const dotenv = require('dotenv');
+dotenv.config();
+
+const mongoose = require('mongoose');
+const MONGO_URI = process.env.MONGODB;
+mongoose
+  .set('strictQuery', false)
+  .connect(MONGO_URI)
+  .then((x) => {
+    const dbName = x.connections[0].name;
+    console.log(`Connected to MongoDB! Database name: "${dbName}"`);
+  })
+  .catch((err) => {
+    console.error('Error connecting to mongo: ', err);
+  });
+
 const cors = require('cors');
-app.use(cors({
-  "credentials": true,
-  "origin": "http://localhost:3000",
-}));
+app.use(
+  cors({
+    credentials: true,
+    origin: 'http://localhost:3000',
+  })
+);
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -14,6 +35,30 @@ const PORT = process.env.PORT || 8000;
 
 const server = app.listen(PORT, () => {
   console.log(`Server listening on the port http://localhost:${PORT}`);
+});
+
+
+
+const usersRoutes = require('./routes/users.routes');
+app.use('/users', usersRoutes);
+
+const authRoutes = require('./routes/auth.routes');
+app.use('/auth', authRoutes);
+
+const productsRoutes = require('./routes/products.routes');
+app.use('/products', productsRoutes);
+
+app.use((err, req, res, next) => {
+  const errorStatus = err.status || 500;
+  const errorMessge = err.message || 'Something went wrong';
+  return res
+    .status(errorStatus)
+    .json({
+      success: false,
+      status: errorStatus,
+      message: errorMessge,
+      stack: err.stack,
+    });
 });
 
 app.get('/getNewProductList', (req, res, next) => {

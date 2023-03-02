@@ -82,9 +82,9 @@ export default function Header() {
                   </div>
                 </div>
               </div>
-              <div className='flex relative justify-between px-4 pl-5 py-1 items-center text-center h-auto w-3/5 h-auto shadow-md shadow-gray-400 bg-white border rounded-full'>
+              <div className='flex relative justify-between px-2 pl-7 py-1 items-center text-center h-auto w-4/5 h-auto shadow-md shadow-gray-400 bg-white border rounded-full sm:text-xs'>
                 <div className='text-lg'>Place</div>
-                <div className='flex items-center border-l border-gray-300'></div>
+                <div className='border-l border-gray-300'></div>
                 <div className='text-lg'>Period</div>
                 <div className='border-l border-gray-300'></div>
                 <div className='text-lg'>People</div>

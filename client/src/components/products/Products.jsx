@@ -42,7 +42,6 @@ export default function Products() {
                   {product.price}
                 </p>
                 <p className='inline ml-2'>/person</p>
-                <p className='inline float-right'>{product.people} available</p>
                 <p>
                   {product.city}, {product.country}
                 </p>

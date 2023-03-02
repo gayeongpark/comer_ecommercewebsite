@@ -7,19 +7,13 @@ import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
-  { name: 'Be a host', href: '#' },
-];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function Navbar() {
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   return (
     <>
       <div className='min-h-full'>
@@ -209,16 +203,32 @@ export default function Navbar() {
                     </button>
                   </div>
                   <div className='mt-3 space-y-1 px-2'>
-                    {userNavigation.map((item) => (
-                      <Disclosure.Button
-                        key={item.name}
-                        as='a'
-                        href={item.href}
+                    {user ? <Disclosure.Button
                         className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
                       >
-                        {item.name}
+                        Log out
+                      </Disclosure.Button> :
+                      <Disclosure.Button
+                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
+                      >
+                        Log in
+                      </Disclosure.Button>}
+                      <Disclosure.Button
+                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
+                      >
+                        Your profile
                       </Disclosure.Button>
-                    ))}
+                      <Disclosure.Button
+                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
+                      > 
+                        Settings
+                      </Disclosure.Button>
+                      <Disclosure.Button
+                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
+                      >
+                        Be a host
+                      </Disclosure.Button>
+                   
                   </div>
                 </div>
               </Disclosure.Panel>
