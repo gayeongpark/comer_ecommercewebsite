@@ -18,11 +18,7 @@ const userSchema = new Schema(
     },
     profilePicture: { type: String },
     location: { type: String },
-    description: { type: String },
-    fromGoogle: {
-      type: Boolean,
-      default: false,
-    },
+    description: { type: String }
   },
   { timestamps: true }
 );

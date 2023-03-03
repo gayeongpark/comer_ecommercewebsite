@@ -37,10 +37,40 @@ router.post('/login', async (req, res, next) => {
       return next(
         createError(403, 'Wrong password or username, please check out!')
       );
-    const token = jwt.sign({ id: user._id }, process.env.JWT);
+    //Access token
+    const accessToken = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+      },
+      process.env.ACCESS_SECRET,
+      {
+        expiresIn: '1h',
+        issuer: 'Park29',
+      }
+    );
+    //refresh token
+    const refreshToken = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+      },
+      process.env.REFRESH_SECRET,
+      {
+        expiresIn: '24h',
+        issuer: 'Park29',
+      }
+    );
+    res.cookie('accessToken', accessToken, {
+      //About http & https
+      httpOnly: true,
+      //This means that the token cannot be accessed from javaScript
+    });
     res
-      .cookie('access_token', token, {
+      .cookie('refreshToken', refreshToken, {
+        //About http & https
         httpOnly: true,
+        //It means that the token cannot be accessed from javaScript
       })
       .status(200)
       .json(user);
@@ -48,5 +78,8 @@ router.post('/login', async (req, res, next) => {
     next(error);
   }
 });
+
+// app.get("/login/success", loginSuccess);
+// app.post("/logout", logout);
 
 module.exports = router;
