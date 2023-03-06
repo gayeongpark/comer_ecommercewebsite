@@ -12,7 +12,7 @@ router.post('/signup', async (req, res, next) => {
     const hash2 = bcrypt.hashSync(req.body.password2, salt);
     const { email, password, password2 } = req.body;
     if (password !== password2)
-      return res.status(400).send('Passwords dont match');
+      return res.status(400).send('Password does not match');
     const user = await User.findOne({ email });
     if (user) return res.status(400).send('User already registered.');
     const newUser = new User({
@@ -37,7 +37,7 @@ router.post('/login', async (req, res, next) => {
       return next(
         createError(403, 'Wrong password or username, please check out!')
       );
-    if (user && isPasswordCorrect) {
+    if (isPasswordCorrect) {
       const accessToken = jwt.sign(
         {
           id: user._id,
@@ -61,41 +61,60 @@ router.post('/login', async (req, res, next) => {
         }
       );
       res.cookie('accessToken', accessToken, {
-        //About http & https
+        secure: false,
         httpOnly: true,
-        //This means that the token cannot be accessed from javaScript
       });
-      res
-        .cookie('refreshToken', refreshToken, {
-          //About http & https
-          httpOnly: true,
-          //It means that the token cannot be accessed from javaScript
-        })
-        .status(200)
-        .send('Login success!');
+
+      res.cookie('refreshToken', refreshToken, {
+        secure: false,
+        httpOnly: true,
+      });
+
+      res.status(200).json('login success');
     }
   } catch (error) {
     next(error);
   }
 });
 
-router.get('accesstoken', async (req,res,next) => {
-  try{
-    const accessToken = req.cookies.accessToken;
-    const data = jwt.verify(accessToken, process.env.ACCESS_SECRET);
-
-    const userData = User.filter(item => {
-      return item.email === data.email;
-    })
-    res.status(200).json(userData)
-    
-  } catch(error) {
-    res.status(500).json(error)
+router.get('/refreshtoken', async (req, res, next) => {
+  try {
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.sendStatus(401);
+    const refreshToken = cookies.jwt;
+    const user = await User.find((item) => item.refreshToken === refreshToken);
+    if (!user) {
+      jwt.verify(refreshToken, process.env.REFRESH_SECRET, (error, decoded) => {
+        if (error || user.email !== decoded.email) {
+          return res.status(406).json({ message: 'Unauthorized!' });
+        }
+        const accessToken = jwt.sign(
+          {
+            id: decoded._id,
+            email: decoded.email,
+          },
+          process.env.ACCESS_SECRET,
+          {
+            expiresIn: '1h',
+            issuer: 'Park29',
+          }
+        );
+        res.json({ accessToken });
+      });
+    }
+  } catch (error) {
+    res.status(500).json(error);
   }
+});
 
-})
-
-// app.get("/login/success", loginSuccess);
-// app.post("/logout", logout);
+router.post('/logout', async (req, res, next) => {
+  try {
+    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken');
+    res.status(200).json('Completely logout');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
 module.exports = router;
