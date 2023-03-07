@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const verify = require('../routes/verification');
 
 const User = require('../models/User.model');
 const router = express.Router();
@@ -45,7 +46,7 @@ router.post('/login', async (req, res, next) => {
         },
         process.env.ACCESS_SECRET,
         {
-          expiresIn: '1h',
+          expiresIn: '30m',
           issuer: 'Park29',
         }
       );
@@ -81,7 +82,7 @@ router.get('/refreshtoken', async (req, res, next) => {
   try {
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(401);
-    const refreshToken = cookies.jwt;
+    const refreshToken = cookies.jwt.refreshToken;
     const user = await User.find((item) => item.refreshToken === refreshToken);
     if (!user) {
       jwt.verify(refreshToken, process.env.REFRESH_SECRET, (error, decoded) => {
@@ -95,7 +96,7 @@ router.get('/refreshtoken', async (req, res, next) => {
           },
           process.env.ACCESS_SECRET,
           {
-            expiresIn: '1h',
+            expiresIn: '30m',
             issuer: 'Park29',
           }
         );
@@ -103,17 +104,17 @@ router.get('/refreshtoken', async (req, res, next) => {
       });
     }
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 });
 
-router.post('/logout', async (req, res, next) => {
+router.post('/logout', verify, async (req, res, next) => {
   try {
     res.clearCookie('refreshToken');
     res.clearCookie('accessToken');
     res.status(200).json('Completely logout');
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 });
 
