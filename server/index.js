@@ -3,7 +3,7 @@ const app = express();
 app.use(express.json());
 
 const cookieParser = require('cookie-parser');
-app.use(cookieParser())
+app.use(cookieParser());
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -37,8 +37,6 @@ const server = app.listen(PORT, () => {
   console.log(`Server listening on the port http://localhost:${PORT}`);
 });
 
-
-
 const usersRoutes = require('./routes/users.routes');
 app.use('/users', usersRoutes);
 
@@ -48,18 +46,18 @@ app.use('/auth', authRoutes);
 const productsRoutes = require('./routes/products.routes');
 app.use('/products', productsRoutes);
 
-app.use((err, req, res, next) => {
-  const errorStatus = err.status || 500;
-  const errorMessge = err.message || 'Something went wrong';
-  return res
-    .status(errorStatus)
-    .json({
-      success: false,
-      status: errorStatus,
-      message: errorMessge,
-      stack: err.stack,
-    });
-});
+// app.use((err, req, res, next) => {
+//   const errorStatus = err.status || 500;
+//   const errorMessge = err.message || 'Something went wrong';
+//   return res
+//     .status(errorStatus)
+//     .json({
+//       success: false,
+//       status: errorStatus,
+//       message: errorMessge,
+//       stack: err.stack,
+//     });
+// });
 
 app.get('/getNewProductList', (req, res, next) => {
   let data = [

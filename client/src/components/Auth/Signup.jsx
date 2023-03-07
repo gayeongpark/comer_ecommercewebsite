@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import axios from 'axios';
-// import { useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../api/firebase';
@@ -11,10 +11,6 @@ import { BiHide } from 'react-icons/bi';
 import { loginGoogle } from '../../api/firebase';
 
 export default function Signup() {
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
-  // const [password2, setPassword2] = useState('');
-
   const emailRef = useRef();
   const passwordRef = useRef();
   const password2Ref = useRef();
@@ -24,29 +20,28 @@ export default function Signup() {
   const toggle = () => {
     setOpen(!open);
   };
-  // const {
-  //   register,
-  //   watch,
-  //   handleSubmit,
-  //   formState: { errors },
-  // } = useForm();
-  // console.log(watch('email'));
-  // const passwordValidate = useRef();
-  // passwordValidate.current = watch('password');
-  // const onSubmit = (data) => {
-  //   console.log('data', data);
-  // };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const user = {
-      email: emailRef.current.value,
-      password: passwordRef.current.value,
-      password2: password2Ref.current.value,
-    };
-    try {
-      await axios.post('/auth/signup', user);
-      navigate('/login');
-    } catch (err) {}
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  console.log(watch('email'));
+  const passwordValidate = useRef();
+  passwordValidate.current = watch('password');
+
+  const onSubmit = async (e) => {
+    alert('for checking')
+    // e.preventDefault();
+    // const user = {
+    //   email: emailRef.current.value,
+    //   password: passwordRef.current.value,
+    //   password2: password2Ref.current.value,
+    // };
+    // try {
+    //   await axios.post('/auth/signup', user);
+    //   navigate('/login');
+    // } catch (error) {}
   };
 
   return (
@@ -89,7 +84,7 @@ export default function Signup() {
 
           <p className='mt-5'>or</p>
         </div>
-        <form className='mx-auto mt-5 max-w-xl sm:mt-5' onSubmit={handleSubmit}>
+        <form className='mx-auto mt-5 max-w-xl sm:mt-5' onSubmit={handleSubmit(onSubmit)}>
           <div className='grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2'>
             <div className='sm:col-span-2' id='email'>
               <label
@@ -100,10 +95,10 @@ export default function Signup() {
               </label>
               <div className='mt-2.5'>
                 <input
-                  // {...register('email', {
-                  //   required: true,
-                  //   pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                  // })}
+                  {...register('email', {
+                    required: true,
+                    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  })}
                   type='email'
                   name='email'
                   id='email'
@@ -111,7 +106,7 @@ export default function Signup() {
                   ref={emailRef}
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
-                {/* {errors.email && <div>* Email is required</div>} */}
+                {errors.email && <div>* Email is required</div>}
               </div>
             </div>
             <div className='sm:col-span-2' id='password'>
@@ -120,10 +115,10 @@ export default function Signup() {
               </label>
               <div className='relative mt-2.5'>
                 <input
-                  // {...register('password', {
-                  //   required: true,
-                  //   minLength: 6,
-                  // })}
+                  {...register('password', {
+                    required: true,
+                    minLength: 6,
+                  })}
                   type={open === false ? 'password' : 'text'}
                   name='password'
                   id='password'
@@ -139,12 +134,12 @@ export default function Signup() {
                     <BiShow className='text-gray-900' onClick={toggle} />
                   )}
                 </div>
-                {/* {errors.password && errors.password.type === 'required' && (
+                {errors.password && errors.password.type === 'required' && (
                   <div>* Password is required</div>
                 )}
                 {errors.password && errors.password.type === 'minLength' && (
                   <div>* Password should contain at least 6 characters</div>
-                )} */}
+                )}
               </div>
             </div>
             <div className='sm:col-span-2' id='password-confirmation'>
@@ -153,10 +148,10 @@ export default function Signup() {
               </label>
               <div className='relative mt-2.5'>
                 <input
-                  // {...register('password_confirmation', {
-                  //   required: true,
-                  //   validate: (value) => value === passwordValidate.current,
-                  // })}
+                  {...register('password_confirmation', {
+                    required: true,
+                    validate: (value) => value === passwordValidate.current,
+                  })}
                   type={open === false ? 'password' : 'text'}
                   name='password_confirmation'
                   id='password_confirmation'
@@ -171,7 +166,7 @@ export default function Signup() {
                     <BiShow className='text-gray-900' onClick={toggle} />
                   )}
                 </div>
-                {/* {errors.password_confirmation &&
+                {errors.password_confirmation &&
                   errors.password_confirmation.type === 'required' && (
                     <div>* Confirmed password is required</div>
                   )}
@@ -180,7 +175,7 @@ export default function Signup() {
                     <div>
                       * Password does not match with password confirmation
                     </div>
-                  )} */}
+                  )}
               </div>
             </div>
           </div>
