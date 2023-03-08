@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User.model');
 
-const isAuth = (req) => {
+const isAuth = (req, res, next) => {
   const authAccessToken = req.cookies['accessToken'];
   if (!authAccessToken) {
-    return res.status(401).json('You are not authenticated!');
+    return res.status(401).json('Access token not found!');
   }
   jwt.verify(
     authAccessToken,
@@ -17,7 +17,7 @@ const isAuth = (req) => {
       if (!user) {
         return res.status(401).json('You are not authenticated!');
       }
-      req.userId = user.id;
+      req.userId = user._id;
       next();
     }
   );

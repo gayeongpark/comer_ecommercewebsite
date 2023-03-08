@@ -11,11 +11,8 @@ import { BiHide } from 'react-icons/bi';
 import { loginGoogle } from '../../api/firebase';
 
 export default function Signup() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const password2Ref = useRef();
   const navigate = useNavigate();
-  const [user] = useAuthState(auth);
+  const [userGoogle] = useAuthState(auth);
   const [open, setOpen] = useState(false);
   const toggle = () => {
     setOpen(!open);
@@ -29,19 +26,20 @@ export default function Signup() {
   console.log(watch('email'));
   const passwordValidate = useRef();
   passwordValidate.current = watch('password');
-
-  const onSubmit = async (e) => {
-    alert('for checking')
-    // e.preventDefault();
-    // const user = {
-    //   email: emailRef.current.value,
-    //   password: passwordRef.current.value,
-    //   password2: password2Ref.current.value,
-    // };
-    // try {
-    //   await axios.post('/auth/signup', user);
-    //   navigate('/login');
-    // } catch (error) {}
+  const onSubmit = async (data) => {
+    const user = {
+      email: data.email,
+      password: data.password,
+      password2: data.password2,
+    };
+    console.log(user);
+    try {
+      await axios.post('/auth/signup', user, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
+      navigate('/login');
+    } catch (error) {}
   };
 
   return (
@@ -55,7 +53,7 @@ export default function Signup() {
           <p className='mt-2 text-lg leading-8 text-gray-600'>
             Explore thousands of experiences and make friends as a member.
           </p>
-          {user ? (
+          {userGoogle ? (
             navigate('/')
           ) : (
             <button
@@ -84,7 +82,10 @@ export default function Signup() {
 
           <p className='mt-5'>or</p>
         </div>
-        <form className='mx-auto mt-5 max-w-xl sm:mt-5' onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className='mx-auto mt-5 max-w-xl sm:mt-5'
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className='grid grid-cols-1 gap-y-6 gap-x-8 sm:grid-cols-2'>
             <div className='sm:col-span-2' id='email'>
               <label
@@ -103,7 +104,6 @@ export default function Signup() {
                   name='email'
                   id='email'
                   autoComplete='off'
-                  ref={emailRef}
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
                 {errors.email && <div>* Email is required</div>}
@@ -123,7 +123,6 @@ export default function Signup() {
                   name='password'
                   id='password'
                   autoComplete='false'
-                  ref={passwordRef}
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
 
@@ -142,21 +141,20 @@ export default function Signup() {
                 )}
               </div>
             </div>
-            <div className='sm:col-span-2' id='password-confirmation'>
+            <div className='sm:col-span-2' id='password2'>
               <label className='block text-sm font-semibold leading-6 text-gray-900'>
                 Password confirmation
               </label>
               <div className='relative mt-2.5'>
                 <input
-                  {...register('password_confirmation', {
+                  {...register('password2', {
                     required: true,
                     validate: (value) => value === passwordValidate.current,
                   })}
                   type={open === false ? 'password' : 'text'}
-                  name='password_confirmation'
-                  id='password_confirmation'
+                  name='password2'
+                  id='password2'
                   autoComplete='false'
-                  ref={password2Ref}
                   className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                 />
                 <div className='text-2xl absolute top-2 right-5 text-gray-300'>
@@ -166,16 +164,14 @@ export default function Signup() {
                     <BiShow className='text-gray-900' onClick={toggle} />
                   )}
                 </div>
-                {errors.password_confirmation &&
-                  errors.password_confirmation.type === 'required' && (
-                    <div>* Confirmed password is required</div>
-                  )}
-                {errors.password_confirmation &&
-                  errors.password_confirmation.type === 'validate' && (
-                    <div>
-                      * Password does not match with password confirmation
-                    </div>
-                  )}
+                {errors.password2 && errors.password2.type === 'required' && (
+                  <div>* Confirmed password is required</div>
+                )}
+                {errors.password2 && errors.password2.type === 'validate' && (
+                  <div>
+                    * Password does not match with password confirmation
+                  </div>
+                )}
               </div>
             </div>
           </div>

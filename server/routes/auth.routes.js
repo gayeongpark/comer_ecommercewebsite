@@ -21,7 +21,7 @@ router.post('/signup', async (req, res, next) => {
     }
     const newUser = new User({
       email: req.body.email,
-      password: hash, 
+      password: hash,
       password2: hash2,
     });
     await newUser.save();
@@ -90,9 +90,11 @@ router.post('/login', async (req, res, next) => {
 router.get('/refreshtoken', async (req, res, next) => {
   try {
     const cookies = req.cookies;
-    if (!cookies?.jwt)
-      return res.status(401).json('You are not authenticated!');
+    if (!cookies.jwt) return res.status(401).json('You are not authenticated!');
     const refreshToken = cookies.jwt.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).send('Refresh token not found');
+    }
     const user = await User.find((item) => item.refreshToken === refreshToken);
     if (user) {
       jwt.verify(refreshToken, process.env.REFRESH_SECRET, (error, decoded) => {
@@ -115,6 +117,7 @@ router.get('/refreshtoken', async (req, res, next) => {
           httpOnly: true,
           maxAge: 1800000,
         });
+        res.status(200).send('Access token refreshed successfully');
       });
     }
   } catch (error) {
@@ -125,7 +128,6 @@ router.get('/refreshtoken', async (req, res, next) => {
 router.post('/logout', isAuth, async (req, res, next) => {
   try {
     res.clearCookie('refreshToken');
-    res.clearCookie('accessToken');
     res.status(200).json('Completely logout');
   } catch (error) {
     next(error);
