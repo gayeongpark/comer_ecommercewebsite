@@ -13,11 +13,11 @@ router.post('/signup', async (req, res, next) => {
     const hash2 = bcrypt.hashSync(req.body.password2, salt);
     const { email, password, password2 } = req.body;
     if (password !== password2) {
-      return res.status(400).send('Password does not match');
+      return res.status(400).json('Password does not match');
     }
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(404).send('User already registered.');
+      return res.status(404).json('User already registered.');
     }
     const newUser = new User({
       email: req.body.email,
@@ -25,7 +25,7 @@ router.post('/signup', async (req, res, next) => {
       password2: hash2,
     });
     await newUser.save();
-    res.status(200).send('New user has been registered!');
+    res.status(200).json('Welcome to Comer!');
   } catch (error) {
     next(error);
   }
@@ -93,7 +93,7 @@ router.get('/refreshtoken', async (req, res, next) => {
     if (!cookies.jwt) return res.status(401).json('You are not authenticated!');
     const refreshToken = cookies.jwt.refreshToken;
     if (!refreshToken) {
-      return res.status(401).send('Refresh token not found');
+      return res.status(401).json('Refresh token not found');
     }
     const user = await User.find((item) => item.refreshToken === refreshToken);
     if (user) {

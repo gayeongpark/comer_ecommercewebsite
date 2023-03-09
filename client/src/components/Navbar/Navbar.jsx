@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../api/firebase';
@@ -6,14 +6,15 @@ import { logoutGoogle } from '../../api/firebase';
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
+import { AuthContext } from '../../context/Auth.context';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function Navbar() {
-  const [user] = useAuthState(auth);
+  const [login, setLogin] = useState(AuthContext)
+  const [userGoogle] = useAuthState(auth);
   return (
     <>
       <div className='min-h-full'>
@@ -46,7 +47,7 @@ export default function Navbar() {
 
                       {/* Profile dropdown */}
                       <Menu as='div' className='relative ml-3'>
-                        {!user && (
+                        {!userGoogle && (
                           <div>
                             <Menu.Button className='flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'>
                               <span className='sr-only'>Open user menu</span>
@@ -58,13 +59,13 @@ export default function Navbar() {
                             </Menu.Button>
                           </div>
                         )}
-                        {user && (
+                        {userGoogle && (
                           <div>
                             <Menu.Button className='flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'>
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
-                                src={user.photoURL}
+                                src={userGoogle.photoURL}
                                 alt=''
                               />
                             </Menu.Button>
@@ -80,7 +81,7 @@ export default function Navbar() {
                           leaveTo='transform opacity-0 scale-95'
                         >
                           <Menu.Items className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                            {!user && (
+                          {!login && (
                               <Link to='/login'>
                                 <Menu.Item>
                                   {({ active }) => (
@@ -97,21 +98,54 @@ export default function Navbar() {
                                 </Menu.Item>
                               </Link>
                             )}
-                            {user && (
+                            {!userGoogle && (
+                              <Link to='/login'>
                                 <Menu.Item>
                                   {({ active }) => (
                                     <div
-                                      onClick={logoutGoogle}
                                       href='#'
                                       className={classNames(
                                         active ? 'bg-gray-100' : '',
                                         'block px-4 py-2 text-sm text-gray-700'
                                       )}
                                     >
-                                      Log out
+                                      Log in
                                     </div>
                                   )}
                                 </Menu.Item>
+                              </Link>
+                            )}
+                            {userGoogle && (
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    onClick={logoutGoogle}
+                                    href='#'
+                                    className={classNames(
+                                      active ? 'bg-gray-100' : '',
+                                      'block px-4 py-2 text-sm text-gray-700'
+                                    )}
+                                  >
+                                    Log out
+                                  </div>
+                                )}
+                              </Menu.Item>
+                            )}
+                            {login && (
+                              <Menu.Item>
+                              {({ active }) => (
+                                <div
+                                  onClick={logoutGoogle}
+                                  href='#'
+                                  className={classNames(
+                                    active ? 'bg-gray-100' : '',
+                                    'block px-4 py-2 text-sm text-gray-700'
+                                  )}
+                                >
+                                  Log out
+                                </div>
+                              )}
+                            </Menu.Item>
                             )}
                             <Menu.Item>
                               {({ active }) => (
@@ -123,19 +157,6 @@ export default function Navbar() {
                                   )}
                                 >
                                   Your Profile
-                                </div>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <div
-                                  href='#'
-                                  className={classNames(
-                                    active ? 'bg-gray-100' : '',
-                                    'block px-4 py-2 text-sm text-gray-700'
-                                  )}
-                                >
-                                  Settings
                                 </div>
                               )}
                             </Menu.Item>
@@ -188,9 +209,9 @@ export default function Navbar() {
                       />
                     </div>
                     <div className='ml-3'>
-                      {user && (
+                      {userGoogle && (
                         <div className='text-sm font-medium leading-none text-gray-400'>
-                          {user.email}
+                          {userGoogle.email}
                         </div>
                       )}
                     </div>
@@ -203,32 +224,26 @@ export default function Navbar() {
                     </button>
                   </div>
                   <div className='mt-3 space-y-1 px-2'>
-                    {user ? <Disclosure.Button
-                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
-                      >
+                    {userGoogle ? (
+                      <Disclosure.Button className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'>
                         Log out
-                      </Disclosure.Button> :
-                      <Disclosure.Button
-                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
-                      >
-                        Log in
-                      </Disclosure.Button>}
-                      <Disclosure.Button
-                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
-                      >
-                        Your profile
                       </Disclosure.Button>
-                      <Disclosure.Button
-                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
-                      > 
-                        Settings
-                      </Disclosure.Button>
-                      <Disclosure.Button
-                        className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'
-                      >
-                        Be a host
-                      </Disclosure.Button>
-                   
+                    ) : (
+                      <Link to={'/login'}>
+                        <Disclosure.Button className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'>
+                          Log in
+                        </Disclosure.Button>
+                      </Link>
+                    )}
+                    <Disclosure.Button className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'>
+                      Your profile
+                    </Disclosure.Button>
+                    <Disclosure.Button className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'>
+                      Settings
+                    </Disclosure.Button>
+                    <Disclosure.Button className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'>
+                      Be a host
+                    </Disclosure.Button>
                   </div>
                 </div>
               </Disclosure.Panel>

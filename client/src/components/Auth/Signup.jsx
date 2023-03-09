@@ -12,6 +12,8 @@ import { loginGoogle } from '../../api/firebase';
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
+
   const [userGoogle] = useAuthState(auth);
   const [open, setOpen] = useState(false);
   const toggle = () => {
@@ -39,9 +41,11 @@ export default function Signup() {
         withCredentials: true,
       });
       navigate('/login');
-    } catch (error) {}
+    } catch (error) {
+      setError(error.response.data);
+    }
   };
-
+  // console.log(error)
   return (
     <div>
       <AuthNav />
@@ -182,6 +186,7 @@ export default function Signup() {
             >
               Continue
             </button>
+            {error && error}
             <div className='mx-auto max-w-2xl text-center'>
               <p className='mt-8 text-md leading-8 text-gray-600'>
                 Alreay have an account?{' '}

@@ -1,23 +1,28 @@
-import { createContext, useState } from 'react';
+import axios from "axios";
+import React, { createContext, useEffect, useState } from "react";
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState({});
-  //   const [persist, setPersist] = useState(
-  //     JSON.parse(localStorage.getItem('persist')) || false
-  //   );
+export const AuthContextProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(
+    JSON.parse(localStorage.getItem("user")) || null
+  );
+
+  const login = async (inputs) => {
+    const response = await axios.post("auth/login", inputs, {
+      withCredentials: true,
+    });
+
+    setCurrentUser(response.data)
+  };
+
+  useEffect(() => {
+    localStorage.setItem("user", JSON.stringify(currentUser));
+  }, [currentUser]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        auth,
-        setAuth,
-        // , persist, setPersist
-      }}
-    >
+    <AuthContext.Provider value={{ currentUser, login }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
