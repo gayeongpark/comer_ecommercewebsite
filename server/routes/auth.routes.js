@@ -1,9 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { isAuth } = require('../middleware/isAuth');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const User = require('../models/User.model');
+const Reset = require('../models/Reset.model');
 const router = express.Router();
 
 router.post('/signup', async (req, res, next) => {
@@ -66,69 +68,147 @@ router.post('/login', async (req, res, next) => {
           expiresIn: '6h',
         }
       );
+
       res.cookie('accessToken', accessToken, {
-        secure: true,
-        sameSite: 'none',
         httpOnly: true,
         maxAge: 1800000,
       });
 
       res.cookie('refreshToken', refreshToken, {
-        secure: true,
-        sameSite: 'none',
         httpOnly: true,
         maxAge: 21600000,
       });
-
-      res.status(200).json('login success');
     }
+    res.status(200).json('login success');
   } catch (error) {
     next(error);
   }
 });
 
-router.get('/refreshtoken', async (req, res, next) => {
+router.post('/refreshtoken', async (req, res, next) => {
   try {
-    const cookies = req.cookies;
-    if (!cookies.jwt) return res.status(401).json('You are not authenticated!');
-    const refreshToken = cookies.jwt.refreshToken;
+    const refreshToken = req.cookies['refreshToken'];
     if (!refreshToken) {
-      return res.status(401).json('Refresh token not found');
+      return res.status(404).json('You are not authenticated!');
     }
-    const user = await User.find((item) => item.refreshToken === refreshToken);
-    if (user) {
-      jwt.verify(refreshToken, process.env.REFRESH_SECRET, (error, decoded) => {
-        if (error || user.email !== decoded.email) {
-          return res.status(406).json('Unauthorized!');
-        }
-        const accessToken = jwt.sign(
-          {
-            id: decoded._id,
-            email: decoded.email,
-          },
-          process.env.ACCESS_SECRET,
-          {
-            expiresIn: '30m',
-          }
-        );
-        res.cookie('accessToken', accessToken, {
-          secure: true,
-          sameSite: 'none',
-          httpOnly: true,
-          maxAge: 1800000,
-        });
-        res.status(200).send('Access token refreshed successfully');
-      });
+
+    const payload = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    // const user = await User.findOne({ id: payload._id, refreshToken });
+
+    if (!payload) {
+      return res.status(406).json('Unauthorized!');
     }
+
+    const accessToken = jwt.sign(
+      {
+        id: decoded._id,
+        email: decoded.email,
+      },
+      process.env.ACCESS_SECRET,
+      {
+        expiresIn: '30m',
+      }
+    );
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 1800000,
+    });
+    res.send(202).json('Re-issued accessToken');
   } catch (error) {
     next(error);
   }
 });
 
-router.post('/logout', isAuth, async (req, res, next) => {
+router.get('/authenticatedUser', async (req, res, next) => {
   try {
+    const authAccessToken = req.cookies['accessToken'];
+    if (!authAccessToken) {
+      return res.status(401).json('Access token not found!');
+    }
+    const payload = jwt.verify(authAccessToken, process.env.ACCESS_SECRET);
+
+    if (!payload) {
+      return res.status(406).json('Unauthorized!');
+    }
+    const user = await User.findOne({ id: payload._id });
+    if (!user) {
+      return res.status(406).json('Unauthorized!');
+    }
+    const { password, password2, ...others } = user._doc;
+    res.json(others);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/logout', async (req, res, next) => {
+  try {
+    res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.status(200).json('Completely logout');
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/forgotPassword', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const token = crypto.randomBytes(32).toString('hex');
+    // res.send(token);
+    //This is random string
+    const existingReset = await Reset.findOne({ email });
+    if (existingReset) {
+      // Email already exists, handle the error
+      return res.status(400).json('This email has already been reset');
+    } else {
+      // Email doesn't exist, save the reset
+      const reset = await Reset.create({ email, token });
+      // Send the password reset email
+    }
+    const transporter = nodemailer.createTransport({
+      host: '0.0.0.0',
+      port: 1025,
+    });
+    const url = `http://localhost:3000/forgotPassword/${token}`;
+    await transporter.sendMail({
+      from: 'from@exapmle.com',
+      to: email,
+      subject: 'Ready to reset your password.',
+      html: `Click <a href='${url}'>here</a> to reset your password`,
+    });
+    res.status(200).json('Please check your email!');
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/resetPassword', async (req, res, next) => {
+  try {
+    const { token, password, password2 } = req.body;
+    if (password !== password2) {
+      return res.status(400).json('Password does not match');
+    }
+    const resetPassword = await Reset.findOne({ token });
+    if (!resetPassword) {
+      return res.status(400).json('Invalid link');
+    }
+    const user = await User.findOne({ email: resetPassword.email });
+    if (!user) {
+      return res.status(400).json('User not found');
+    }
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(req.body.password, salt);
+    const hash2 = bcrypt.hashSync(req.body.password2, salt);
+    await User.updateOne(
+      { _id: user._id },
+      {
+        password: hash,
+        password2: hash2,
+      }
+    );
+    res.status(202).json('Completely update it!');
   } catch (error) {
     next(error);
   }
