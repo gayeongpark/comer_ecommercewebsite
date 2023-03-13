@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Product from './pages/Product';
 import Posting from './pages/Posting';
+import ForgotPassword from './pages/ForgotPassword';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route index path='/' element={<Home />} />
       <Route path='/signup' element={<AuthSignUp />} />
       <Route path='/login' element={<AuthLogIn />} />
+      <Route path='/forgotPassword' element={<ForgotPassword />} />
       <Route path='/profile' element={<Profile />} />
       <Route path='/product' element={<Product />} />
       <Route path='/posting' element={<Posting />} />

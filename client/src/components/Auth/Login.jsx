@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../api/firebase';
 import { useNavigate } from 'react-router-dom';
@@ -7,31 +7,12 @@ import AuthNav from './AuthNav';
 import { loginGoogle } from '../../api/firebase';
 import { BiShow } from 'react-icons/bi';
 import { BiHide } from 'react-icons/bi';
-import { AuthContext } from '../../context/Auth.context';
+import axios from 'axios';
 
 export default function Login() {
-  const [inputs, setInputs] = useState({
-    email: '',
-    password: '',
-  });
-
+  const [email, setEmail] = useState('');
+  const [password, setPassowrd] = useState('');
   const [error, setError] = useState(null);
-
-  const handleChange = (e) => {
-    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-  const { login } = useContext(AuthContext);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await login(inputs);
-      navigate('/');
-    } catch (error) {
-      setError(error.response.data);
-    }
-  };
-
   const navigate = useNavigate();
 
   const [userGoogle] = useAuthState(auth);
@@ -39,6 +20,23 @@ export default function Login() {
   const [open, setOpen] = useState(false);
   const toggle = () => {
     setOpen(!open);
+  };
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const response = {
+        email,
+        password,
+      };
+      // console.log(response);
+      await axios.post('/auth/login', response, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
+      navigate('/');
+    } catch (error) {
+      setError(error.response.data);
+    }
   };
 
   return (
@@ -100,7 +98,7 @@ export default function Login() {
                     name='email'
                     id='email'
                     autoComplete='off'
-                    onChange={handleChange}
+                    onChange={(e) => setEmail(e.target.value)}
                     className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                     required
                   />
@@ -116,7 +114,7 @@ export default function Login() {
                     name='password'
                     id='password'
                     autoComplete='off'
-                    onChange={handleChange}
+                    onChange={(e) => setPassowrd(e.target.value)}
                     className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                     required
                   />
@@ -137,11 +135,19 @@ export default function Login() {
               >
                 Continue
               </button>
+              {error && error}
               <div className='mx-auto max-w-2xl text-center'>
                 <p className='mt-8 text-md leading-8 text-gray-600'>
                   Don't have an Account?{' '}
                   <Link to='/signup'>
                     <button>Create One</button>
+                  </Link>
+                </p>
+              </div>
+              <div className='mx-auto max-w-2xl text-center'>
+                <p className='mt-4 text-md leading-8 text-gray-600'>
+                  <Link to='/forgotPassword'>
+                    <button>Forgot password?</button>
                   </Link>
                 </p>
               </div>

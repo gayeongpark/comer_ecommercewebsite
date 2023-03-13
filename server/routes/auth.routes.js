@@ -79,7 +79,7 @@ router.post('/login', async (req, res, next) => {
         maxAge: 21600000,
       });
     }
-    res.status(200).json('login success');
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }
@@ -89,14 +89,13 @@ router.post('/refreshtoken', async (req, res, next) => {
   try {
     const refreshToken = req.cookies['refreshToken'];
     if (!refreshToken) {
-      return res.status(404).json('You are not authenticated!');
+      return res.status(401).json('You are not authenticated!');
     }
 
     const payload = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
-    // const user = await User.findOne({ id: payload._id, refreshToken });
 
     if (!payload) {
-      return res.status(406).json('Unauthorized!');
+      return res.status(401).json('Unauthorized!');
     }
 
     const accessToken = jwt.sign(
@@ -164,7 +163,11 @@ router.post('/forgotPassword', async (req, res, next) => {
       return res.status(400).json('This email has already been reset');
     } else {
       // Email doesn't exist, save the reset
-      const reset = await Reset.create({ email, token });
+      const newReset = new Reset({
+        email,
+        token,
+      });
+      await newReset.save();
       // Send the password reset email
     }
     const transporter = nodemailer.createTransport({
@@ -173,7 +176,7 @@ router.post('/forgotPassword', async (req, res, next) => {
     });
     const url = `http://localhost:3000/forgotPassword/${token}`;
     await transporter.sendMail({
-      from: 'from@exapmle.com',
+      from: 'comernoreply@comer.com',
       to: email,
       subject: 'Ready to reset your password.',
       html: `Click <a href='${url}'>here</a> to reset your password`,
