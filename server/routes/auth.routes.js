@@ -174,7 +174,7 @@ router.post('/forgotPassword', async (req, res, next) => {
       host: '0.0.0.0',
       port: 1025,
     });
-    const url = `http://localhost:3000/forgotPassword/${token}`;
+    const url = `http://localhost:3000/resetPassword/${token}`;
     await transporter.sendMail({
       from: 'comernoreply@comer.com',
       to: email,

@@ -20,6 +20,7 @@ export default function Navbar() {
     (async () => {
       try {
         const response = await axios.get('/auth/authenticatedUser', {
+          headers: { 'Content-Type': 'application/json' },
           withCredentials: true,
         });
         const user = response.data;
@@ -74,7 +75,7 @@ export default function Navbar() {
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
-                                src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+                                src='https://images.unsplash.com/photo-1468657988500-aca2be09f4c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80'
                                 alt=''
                               />
                             </Menu.Button>
@@ -98,7 +99,7 @@ export default function Navbar() {
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
-                                src='https://banner2.cleanpng.com/20180617/ufb/kisspng-question-mark-computer-icons-button-5b27232213e0f6.1053251815292915540814.jpg'
+                                src='https://images.unsplash.com/photo-1673454343632-b8bd0e0754a7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80'
                                 alt=''
                               />
                             </Menu.Button>

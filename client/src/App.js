@@ -7,6 +7,8 @@ import Profile from './pages/Profile';
 import Product from './pages/Product';
 import Posting from './pages/Posting';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+
 
 export default function App() {
   return (
@@ -15,6 +17,7 @@ export default function App() {
       <Route path='/signup' element={<AuthSignUp />} />
       <Route path='/login' element={<AuthLogIn />} />
       <Route path='/forgotPassword' element={<ForgotPassword />} />
+      <Route path='/resetPassword/:token' element={<ResetPassword />} />
       <Route path='/profile' element={<Profile />} />
       <Route path='/product' element={<Product />} />
       <Route path='/posting' element={<Posting />} />

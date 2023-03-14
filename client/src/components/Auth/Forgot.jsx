@@ -1,10 +1,38 @@
 import React, { useState } from 'react';
 import AuthNav from './AuthNav';
+import axios from 'axios';
 
 export default function Forgot() {
   const [email, setEmail] = useState('');
-  const handleSubmit = (e) => {
+  const [notify, setNotify] = useState({
+    show: false,
+    error: false,
+    message: '',
+  });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      await axios.post(
+        '/auth/forgotPassword',
+        { email },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        }
+      );
+      setNotify({
+        show: true,
+        error: false,
+        message: 'Please check out your email box',
+      });
+    } catch (error) {
+      setNotify({
+        show: true,
+        error: true,
+        message: 'Please check out your email address!',
+      });
+    }
   };
   return (
     <div>
@@ -15,7 +43,6 @@ export default function Forgot() {
             <h1 className='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl'>
               Forgot password
             </h1>
-            <p className='mt-5'>or</p>
           </div>
 
           <form
@@ -48,8 +75,9 @@ export default function Forgot() {
                 type='submit'
                 className='block w-full rounded-md bg-red-700 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700'
               >
-                Continue
+                Submit
               </button>
+              <div>{notify.show && notify.message}</div>
             </div>
           </form>
         </div>
