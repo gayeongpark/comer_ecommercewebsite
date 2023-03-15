@@ -1,7 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GoSearch } from 'react-icons/go';
+import { FaSearchLocation } from 'react-icons/fa';
+import { RiSubtractFill } from 'react-icons/ri';
+import { RiAddFill } from 'react-icons/ri';
+import { FaCalendarDay } from 'react-icons/fa';
+import { SlPeople } from 'react-icons/sl';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css files
+import { DateRange } from 'react-date-range';
+import { format } from 'date-fns';
 
 export default function Header() {
+  const [openDate, setOpenDate] = useState(false);
+  const [openOptions, setOpenOptions] = useState(false);
+  const [options, setOptions] = useState({
+    adults: 0,
+    children: 0,
+  });
+  const [date, setDate] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection',
+    },
+  ]);
+
+  const handleOption = (name, operation) => {
+    setOptions((prev) => {
+      return {
+        ...prev,
+        [name]:
+          operation === 'increase' ? options[name] + 1 : options[name] - 1,
+      };
+    });
+  };
+
   return (
     <div className='relative overflow-hidden bg-white'>
       <div className='pt-16 pb-80 sm:pt-24 sm:pb-40 lg:pt-40 lg:pb-48'>
@@ -66,14 +99,14 @@ export default function Header() {
                     <div className='grid flex-shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8'>
                       <div className='h-64 w-44 overflow-hidden rounded-lg'>
                         <img
-                          src='https://previews.123rf.com/images/comebackimages/comebackimages1904/comebackimages190400114/120961006-cheerful-young-people-enjoying-eating-delicious-pizza-and-talking-during-dinner-with-friends-in-rest.jpg'
+                          src='https://images.unsplash.com/photo-1561539623-f8091d2c2b20?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80'
                           alt='image6'
                           className='h-full w-full object-cover object-center'
                         />
                       </div>
                       <div className='h-64 w-44 overflow-hidden rounded-lg'>
                         <img
-                          src='https://images.unsplash.com/photo-1592861956120-e524fc739696?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80g'
+                          src='https://images.unsplash.com/photo-1542675432-01256604c232?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=876&q=80'
                           alt='image7'
                           className='h-full w-full object-cover object-center'
                         />
@@ -83,11 +116,86 @@ export default function Header() {
                 </div>
               </div>
               <div className='flex relative justify-between px-2 pl-7 py-1 items-center text-center h-auto w-4/5 h-auto shadow-md shadow-gray-400 bg-white border rounded-full sm:text-xs'>
-                <div className='text-lg'>Place</div>
+                <div className='flex text-lg items-center gap-0.3'>
+                  <FaSearchLocation className='text-gray-300' />
+                  <input
+                    type='text'
+                    placeholder='Where are you now?'
+                    className='border-none outline-none sm:placeholder-opacity-25 focus:border-none focus:outline-none focus:ring-0'
+                  />
+                </div>
                 <div className='border-l border-gray-300'></div>
-                <div className='text-lg'>Period</div>
+                <div className='flex text-lg items-center gap-1.5'>
+                  <FaCalendarDay className='text-gray-300' />
+                  <span
+                    onClick={() => setOpenDate(!openDate)}
+                    className='text-gray-400 cursor-pointer'
+                  >
+                    {`${format(date[0].startDate, 'MM/dd/yyyy')} to 
+                    ${format(date[0].endDate, 'MM/dd/yyyy')}`}
+                  </span>
+                  {openDate && (
+                    <DateRange
+                      editableDateInputs={true}
+                      onChange={(item) => setDate([item.selection])}
+                      moveRangeOnFirstSelection={false}
+                      ranges={date}
+                      className='absolute top-16 z-40'
+                    />
+                  )}
+                </div>
                 <div className='border-l border-gray-300'></div>
-                <div className='text-lg'>People</div>
+                <div className='flex text-lg items-center gap-1.5'>
+                  <SlPeople className='text-gray-300' />
+                  <span
+                    onClick={() => setOpenOptions(!openOptions)}
+                    className='text-gray-400 cursor-pointer'
+                  >{`${options.adults} adult / ${options.children} children`}</span>
+                  {openOptions && (
+                    <div className='absolute top-16 bg-white border text-gray-400 rounded shadow-md'>
+                      <div className='flex w-30 m-6 justify-between m-8'>
+                        <span className='w-auto justify-between m-1'>
+                          Adult
+                        </span>
+                        <div className='flex items-center gap-7 text-xl text-gray-900 ml-5'>
+                          <button
+                            onClick={() => handleOption('adults', 'decrease')}
+                            className='bg-red-700 p-1 flex-row-reverse rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2'
+                            disabled={options.adults <= 1}
+                          >
+                            <RiSubtractFill className='text-white font-bold text-xl' />
+                          </button>
+                          <span>{options.adults}</span>
+                          <button
+                            onClick={() => handleOption('adults', 'increase')}
+                            className='bg-red-700 p-1 flex-row-reverse rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2'
+                          >
+                            <RiAddFill className='text-white font-bold text-xl' />
+                          </button>
+                        </div>
+                      </div>
+                      <div className='flex w-30 m-6 justify-between m-8'>
+                        <span>Children</span>
+                        <div className='flex items-center gap-7 text-xl text-gray-900 ml-5'>
+                          <button
+                            onClick={() => handleOption('children', 'decrease')}
+                            className='bg-red-700 p-1 flex-row-reverse rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2'
+                            disabled={options.children <= 0}
+                          >
+                            <RiSubtractFill className='text-white font-bold text-xl' />
+                          </button>
+                          <span>{options.children}</span>
+                          <button
+                            onClick={() => handleOption('children', 'increase')}
+                            className='bg-red-700 p-1 flex-row-reverse rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2'
+                          >
+                            <RiAddFill className='text-white font-bold text-xl' />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <button className='flex bg-red-700 p-4 flex-row-reverse rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2'>
                   <GoSearch className='text-white font-bold text-xl' />
                 </button>

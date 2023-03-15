@@ -50,6 +50,9 @@ export default function Products() {
           ))}
         </div>
       </div>
+      <div className='flex items-center justify-center my-8'>
+        <button className='flex rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'>Load more</button>
+      </div>
     </div>
   );
 }

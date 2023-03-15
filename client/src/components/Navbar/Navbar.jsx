@@ -7,6 +7,8 @@ import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAuthUser } from '../../redux/authSlice';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -16,22 +18,28 @@ export default function Navbar() {
   const [userGoogle] = useAuthState(auth);
   const [user, setUser] = useState('');
   const [authenticate, setAuthenticate] = useState(false);
+  const authUser = useSelector((state) => state.authUser.value);
+  const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
-      try {
-        const response = await axios.get('/auth/authenticatedUser', {
-          headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,
-        });
-        const user = response.data;
-        setAuthenticate(true);
-        setUser(user);
-        console.log(user);
-      } catch (error) {
-        setAuthenticate(false);
+      if (authUser) {
+        try {
+          const response = await axios.get('/auth/authenticatedUser', {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+          });
+          const user = response.data;
+          setAuthenticate(true);
+          setUser(user);
+          dispatch(setAuthUser(true));
+          console.log(user);
+        } catch (error) {
+          setAuthenticate(false);
+          dispatch(setAuthUser(false));
+        }
       }
     })();
-  }, []);
+  }, [authUser, dispatch]);
   const logout = async () => {
     await axios.post('/auth/logout');
     window.location.reload();
@@ -61,7 +69,7 @@ export default function Navbar() {
                       </button>
                       <button
                         type='button'
-                        className='rounded-full p-1 text-gray-400 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'
+                        className='rounded-full p-1 text-red-400 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'
                       >
                         <span className='sr-only'>View notifications</span>
                         <BellIcon className='h-6 w-6' aria-hidden='true' />
