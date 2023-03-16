@@ -144,13 +144,14 @@ export default function Header() {
                     />
                   )}
                 </div>
+                  
                 <div className='border-l border-gray-300'></div>
                 <div className='flex text-lg items-center gap-1.5'>
                   <SlPeople className='text-gray-300' />
                   <span
                     onClick={() => setOpenOptions(!openOptions)}
                     className='text-gray-400 cursor-pointer'
-                  >{`${options.adults} adult / ${options.children} children`}</span>
+                  >{`${options.adults} adult · ${options.children} children`}</span>
                   {openOptions && (
                     <div className='absolute top-16 bg-white border text-gray-400 rounded shadow-md'>
                       <div className='flex w-30 m-6 justify-between m-8'>

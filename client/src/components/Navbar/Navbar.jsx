@@ -48,7 +48,7 @@ export default function Navbar() {
   return (
     <>
       <div className='min-h-full'>
-        <Disclosure as='nav' className='bg-800'>
+        <Disclosure as='nav' className='relative bg-800'>
           {({ open }) => (
             <>
               <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>

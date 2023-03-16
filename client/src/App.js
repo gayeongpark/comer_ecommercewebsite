@@ -8,6 +8,7 @@ import Product from './pages/Product';
 import Posting from './pages/Posting';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import MyProfile from './pages/MyProfile';
 
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
     <Routes>
       <Route index path='/' element={<Home />} />
       <Route path='/signup' element={<AuthSignUp />} />
+      <Route path='/myProfile' element={<MyProfile/>}/>
       <Route path='/login' element={<AuthLogIn />} />
       <Route path='/forgotPassword' element={<ForgotPassword />} />
       <Route path='/resetPassword/:token' element={<ResetPassword />} />
