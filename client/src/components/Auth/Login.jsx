@@ -28,7 +28,7 @@ export default function Login() {
         email,
         password,
       };
-      // console.log(response);
+      console.log(response);
       await axios.post('/auth/login', response, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,

@@ -16,7 +16,7 @@ export default function App() {
     <Routes>
       <Route index path='/' element={<Home />} />
       <Route path='/signup' element={<AuthSignUp />} />
-      <Route path='/myProfile' element={<MyProfile/>}/>
+      <Route path='/yourProfile/:id' element={<MyProfile/>}/>
       <Route path='/login' element={<AuthLogIn />} />
       <Route path='/forgotPassword' element={<ForgotPassword />} />
       <Route path='/resetPassword/:token' element={<ResetPassword />} />

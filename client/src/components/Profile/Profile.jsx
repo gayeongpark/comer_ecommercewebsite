@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAuthUser } from '../../redux/authSlice';
 import { Link } from 'react-router-dom';
 
 export default function Profile() {
@@ -7,6 +9,10 @@ export default function Profile() {
   const [openInputEmail, setOpenInputEmail] = useState(false);
   const [openInputPhone, setOpenInputPhone] = useState(false);
   const [openInputAddress, setOpenInputAddress] = useState(false);
+
+  const authUser = useSelector((state) => state.authUser.value);
+
+  const dispatch = useDispatch();
   return (
     <div className='mx-auto mb-20 max-w-7xl px-4 sm:px-6 lg:px-8 overflow-hidden bg-white py-5 sm:rounded-lg'>
       <div className='px-4 py-6'>
@@ -25,7 +31,7 @@ export default function Profile() {
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
               <span className='inline-block h-36 w-36 mb-2 overflow-hidden rounded-full bg-gray-100'>
                 <svg
-                onClick={() => setOpenInputImage(!openInputImage)}
+                  onClick={() => setOpenInputImage(!openInputImage)}
                   className='flex h-full w-full text-gray-300'
                   fill='currentColor'
                   viewBox='0 0 24 24'
@@ -35,14 +41,55 @@ export default function Profile() {
               </span>
             </dd>
             {openInputImage && (
-            <div className='flex items-center space-x-4 mt-3 mt-4'>
-              <button
-                type='button'
-                className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-              >
-                Save
-              </button>
+              <div className='flex items-center space-x-4 mt-3 mt-4'>
+                <button
+                  type='button'
+                  className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                >
+                  Save
+                </button>
+              </div>
+            )}
+          </div>
+          <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
+            <dt className='text-sm font-medium text-gray-500'>
+              Short introduction
+            </dt>
+            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
+              Hello, my name is GaYeong Park from Jeonju, South Korea.
+            </dd>
+            <div
+              onClick={() => setOpenInputEmail(!openInputEmail)}
+              className='font-medium text-red-600 cursor-pointer'
+            >
+              Edit
             </div>
+            {openInputEmail && (
+              <div className='col-span-6 sm:col-span-3'>
+                <label
+                  htmlFor='description'
+                  className='block text-sm font-medium leading-6 text-gray-900'
+                >
+                  Short introduction
+                </label>
+                <textarea
+                  type='text'
+                  name='description'
+                  id='description'
+                  autoComplete='off'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                />
+              </div>
+            )}
+            {openInputEmail && (
+              <div className='flex items-center space-x-4 mt-4'>
+                <button
+                  type='button'
+                  className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                >
+                  Save
+                </button>
+              </div>
             )}
           </div>
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
@@ -153,31 +200,31 @@ export default function Profile() {
               Edit
             </div>
             {openInputPhone && (
-            <div className='col-span-6 sm:col-span-3'>
-              <label
-                htmlFor='first-name'
-                className='block text-sm font-medium leading-6 text-gray-900'
-              >
-                Phone Number
-              </label>
-              <input
-                type='text'
-                name='phone-number'
-                id='phone-number'
-                autoComplete='off'
-                className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
-              />
-            </div>
+              <div className='col-span-6 sm:col-span-3'>
+                <label
+                  htmlFor='first-name'
+                  className='block text-sm font-medium leading-6 text-gray-900'
+                >
+                  Phone Number
+                </label>
+                <input
+                  type='text'
+                  name='phone-number'
+                  id='phone-number'
+                  autoComplete='off'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                />
+              </div>
             )}
             {openInputPhone && (
-            <div className='flex items-center space-x-4 mt-4'>
-              <button
-                type='button'
-                className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-              >
-                Save
-              </button>
-            </div>
+              <div className='flex items-center space-x-4 mt-4'>
+                <button
+                  type='button'
+                  className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                >
+                  Save
+                </button>
+              </div>
             )}
           </div>
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
@@ -291,6 +338,9 @@ export default function Profile() {
                 >
                   Save
                 </button>
+                <div>
+                  Do you want to delete your account?
+                </div>
               </div>
             )}
           </div>

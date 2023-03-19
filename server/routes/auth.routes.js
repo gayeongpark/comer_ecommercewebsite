@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
-const User = require('../models/User.model');
-const Reset = require('../models/Reset.model');
+const User = require('../models/User.model.js');
+const Reset = require('../models/Reset.model.js');
 const router = express.Router();
 
 router.post('/signup', async (req, res, next) => {
@@ -218,3 +218,4 @@ router.post('/resetPassword', async (req, res, next) => {
 });
 
 module.exports = router;
+

@@ -21,28 +21,29 @@ export default function Navbar() {
   const authUser = useSelector((state) => state.authUser.value);
   const dispatch = useDispatch();
   useEffect(() => {
-    (async () => {
-      if (authUser) {
-        try {
-          const response = await axios.get('/auth/authenticatedUser', {
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true,
-          });
-          const user = response.data;
-          setAuthenticate(true);
-          setUser(user);
-          dispatch(setAuthUser(true));
-          console.log(user);
-        } catch (error) {
-          setAuthenticate(false);
-          dispatch(setAuthUser(false));
-        }
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get('/auth/authenticatedUser', {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        });
+        const user = response.data;
+        setAuthenticate(true);
+        setUser(user);
+        dispatch(setAuthUser(true));
+      } catch (error) {
+        setAuthenticate(false);
+        dispatch(setAuthUser(false));
       }
-    })();
+    };
+
+    if (!authUser) {
+      fetchUser();
+    }
   }, [authUser, dispatch]);
   const logout = async () => {
     await axios.post('/auth/logout');
-    window.location.reload();
+    window.location.href = 'login';
   };
 
   return (
@@ -188,39 +189,40 @@ export default function Navbar() {
                                 )}
                               </Menu.Item>
                             )}
-                            {/* {userGoogle && (
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={logoutGoogle}
-                                    href='#'
-                                    className={classNames(
-                                      active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm text-gray-700'
-                                    )}
-                                  >
-                                    Log out
-                                  </div>
-                                )}
-                              </Menu.Item>
-                            )} */}
                             {(authenticate || userGoogle) && (
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    onClick={logoutGoogle}
+                                    onClick={logout}
                                     href='#'
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
                                       'block px-4 py-2 text-sm text-gray-700'
                                     )}
                                   >
-                                    Your profile
+                                    Hosted experinece
                                   </div>
                                 )}
                               </Menu.Item>
                             )}
-                            {/* {userGoogle && (
+                            {(authenticate || userGoogle) && (
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    onClick={logout}
+                                    href='#'
+                                    className={classNames(
+                                      active ? 'bg-gray-100' : '',
+                                      'block px-4 py-2 text-sm text-gray-700'
+                                    )}
+                                  >
+                                    Booked experience
+                                  </div>
+                                )}
+                              </Menu.Item>
+                            )}
+                            {(authenticate || userGoogle) && (
+                               <Link to='/yourProfile/:id'>
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
@@ -235,7 +237,8 @@ export default function Navbar() {
                                   </div>
                                 )}
                               </Menu.Item>
-                            )} */}
+                              </Link>
+                            )}
                             <Menu.Item>
                               {({ active }) => (
                                 <div

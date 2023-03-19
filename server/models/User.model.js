@@ -16,9 +16,18 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    phoneNumber: {
+      type: Number,
+    },
     profilePicture: { type: String },
     location: { type: String },
-    description: { type: String }
+    description: { type: String },
   },
   { timestamps: true }
 );
