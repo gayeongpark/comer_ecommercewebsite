@@ -38,7 +38,7 @@ router.post('/login', async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return send(404).json('This user was not registered!');
+      return res.status(404).json('This user was not registered!');
     }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
@@ -79,7 +79,10 @@ router.post('/login', async (req, res, next) => {
         maxAge: 21600000,
       });
     }
-    res.status(200).json(user);
+    const resData = {email: user.email, id: user.id};
+    // console.log(user)
+
+    res.status(200).json(resData);
   } catch (error) {
     next(error);
   }
@@ -100,8 +103,8 @@ router.post('/refreshtoken', async (req, res, next) => {
 
     const accessToken = jwt.sign(
       {
-        id: decoded._id,
-        email: decoded.email,
+        id: payload._id,
+        email: payload.email,
       },
       process.env.ACCESS_SECRET,
       {
@@ -113,33 +116,33 @@ router.post('/refreshtoken', async (req, res, next) => {
       httpOnly: true,
       maxAge: 1800000,
     });
-    res.send(202).json('Re-issued accessToken');
+    res.status(202).json('Re-issued accessToken');
   } catch (error) {
     next(error);
   }
 });
 
-router.get('/authenticatedUser', async (req, res, next) => {
-  try {
-    const authAccessToken = req.cookies['accessToken'];
-    if (!authAccessToken) {
-      return res.status(401).json('Access token not found!');
-    }
-    const payload = jwt.verify(authAccessToken, process.env.ACCESS_SECRET);
+// router.get('/authenticatedUser', async (req, res, next) => {
+//   try {
+//     const accessToken = req.cookies['accessToken'];
+//     if (!accessToken) {
+//       return res.status(401).json('Access token not found!');
+//     }
+//     const payload = jwt.verify(accessToken, process.env.ACCESS_SECRET);
 
-    if (!payload) {
-      return res.status(406).json('Unauthorized!');
-    }
-    const user = await User.findOne({ id: payload._id });
-    if (!user) {
-      return res.status(406).json('Unauthorized!');
-    }
-    const { password, password2, ...others } = user._doc;
-    res.json(others);
-  } catch (error) {
-    next(error);
-  }
-});
+//     if (!payload) {
+//       return res.status(406).json('Unauthorized!');
+//     }
+//     const user = await User.findOne({ email: payload.email });
+//     if (!user) {
+//       return res.status(406).json('Unauthorized!');
+//     }
+//     const { password, password2, ...others } = user._doc;
+//     res.status(200).json(others);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 router.post('/logout', async (req, res, next) => {
   try {
@@ -218,4 +221,3 @@ router.post('/resetPassword', async (req, res, next) => {
 });
 
 module.exports = router;
-

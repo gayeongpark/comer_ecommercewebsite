@@ -7,6 +7,8 @@ import AuthNav from './AuthNav';
 import { loginGoogle } from '../../api/firebase';
 import { BiShow } from 'react-icons/bi';
 import { BiHide } from 'react-icons/bi';
+import { useDispatch } from 'react-redux';
+import { setAuthUser } from '../../redux/authSlice';
 import axios from 'axios';
 
 export default function Login() {
@@ -14,6 +16,9 @@ export default function Login() {
   const [password, setPassowrd] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  // const authUser = useSelector((state) => state.authUser.value);
+  const dispatch = useDispatch();
 
   const [userGoogle] = useAuthState(auth);
 
@@ -24,18 +29,24 @@ export default function Login() {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      const response = {
+      const params = {
         email,
         password,
       };
-      console.log(response);
-      await axios.post('/auth/login', response, {
+      const response = await axios.post('/auth/login', params, {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
+      const user = response.data;
+      console.log(user);
+      dispatch(setAuthUser(user));
+      //coverting setAuthUser(false) into (true)
+      // authUser(user);
+      //containing user in authUser selector
       navigate('/');
     } catch (error) {
-      setError(error.response.data);
+      setError(error.user);
+      dispatch(setAuthUser(false));
     }
   };
 

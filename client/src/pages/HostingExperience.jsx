@@ -1,13 +1,13 @@
 import React from 'react';
+import Posting from '../components/Posting/Posting';
 import Navbar from '../components/Navbar/Navbar';
-import Profile from '../components/Profile/Profile';
 import Footer from '../components/Footer/Footer';
 
-export default function MyProfile() {
+export default function HostingExperience() {
   return (
     <div>
       <Navbar />
-      <Profile />
+      <Posting />
       <Footer />
     </div>
   );

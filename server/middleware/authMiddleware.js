@@ -17,7 +17,7 @@ const authenticateUser = async (req, res, next) => {
       return res.status(406).json('Unauthorized!');
     }
     req.user = user;
-    //By attaching the user object to the req object, the user object can be accessed in subsequent middleware functions or route handlers that use the same req object. 
+    //By attaching the user object to the req object, the user object can be accessed in subsequent middleware functions or route handlers that use the same req object.
     //This means that the authenticated user's details can be easily accessed by any middleware functions or route handlers that follow the authentication middleware.
     next();
   } catch (error) {

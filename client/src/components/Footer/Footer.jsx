@@ -25,7 +25,7 @@ export default function Footer() {
             <p className='mb-3 font-light cursor-pointer'>
               Explore how to make experiences
             </p>
-            <p className='mb-3 font-light cursor-pointer'>Hosting resources</p>
+            <p className='mb-3 font-light cursor-pointer'>Host resources</p>
             <p className='mb-3 font-light cursor-pointer'>
               Host community forum
             </p>

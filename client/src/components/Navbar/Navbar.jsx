@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../api/firebase';
@@ -7,8 +7,7 @@ import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAuthUser } from '../../redux/authSlice';
+import { useSelector } from 'react-redux';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -16,34 +15,18 @@ function classNames(...classes) {
 
 export default function Navbar() {
   const [userGoogle] = useAuthState(auth);
-  const [user, setUser] = useState('');
-  const [authenticate, setAuthenticate] = useState(false);
-  const authUser = useSelector((state) => state.authUser.value);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get('/auth/authenticatedUser', {
-          headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,
-        });
-        const user = response.data;
-        setAuthenticate(true);
-        setUser(user);
-        dispatch(setAuthUser(true));
-      } catch (error) {
-        setAuthenticate(false);
-        dispatch(setAuthUser(false));
-      }
-    };
 
-    if (!authUser) {
-      fetchUser();
-    }
-  }, [authUser, dispatch]);
+  const authUser = useSelector((state) => state.authUser.value);
+  console.log(authUser)
+
   const logout = async () => {
-    await axios.post('/auth/logout');
-    window.location.href = 'login';
+    const loggedOut = await axios.post('/auth/logout', {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+    });
+    if (loggedOut) {
+      window.location.href = 'http://localhost:3000/login';
+    }
   };
 
   return (
@@ -62,12 +45,14 @@ export default function Navbar() {
                   </div>
                   <div className='hidden md:block'>
                     <div className='ml-4 flex items-center md:ml-6 space-x-4'>
-                      <button
-                        type='button'
-                        className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                      >
-                        Be a host
-                      </button>
+                      <Link to='./hostingExperience/:id'>
+                        <button
+                          type='button'
+                          className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                        >
+                          Be a host
+                        </button>
+                      </Link>
                       <button
                         type='button'
                         className='rounded-full p-1 text-red-400 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'
@@ -78,7 +63,7 @@ export default function Navbar() {
 
                       {/* Profile dropdown */}
                       <Menu as='div' className='relative ml-3'>
-                        {!userGoogle && !authenticate && (
+                        {!userGoogle && !authUser && (
                           <div>
                             <Menu.Button className='flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
                               <span className='sr-only'>Open user menu</span>
@@ -102,13 +87,13 @@ export default function Navbar() {
                             </Menu.Button>
                           </div>
                         )}
-                        {authenticate && (
+                        {authUser && (
                           <div>
-                            <Menu.Button className='flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
+                            <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
-                                src='https://images.unsplash.com/photo-1673454343632-b8bd0e0754a7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80'
+                                src='https://www.donut.app/assets/donut.png'
                                 alt=''
                               />
                             </Menu.Button>
@@ -124,7 +109,7 @@ export default function Navbar() {
                           leaveTo='transform opacity-0 scale-95'
                         >
                           <Menu.Items className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
-                            {!authenticate && !userGoogle && (
+                            {!authUser && !userGoogle && (
                               <Link to='/login'>
                                 <Menu.Item>
                                   {({ active }) => (
@@ -141,7 +126,7 @@ export default function Navbar() {
                                 </Menu.Item>
                               </Link>
                             )}
-                            {authenticate && (
+                            {authUser && (
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
@@ -152,7 +137,7 @@ export default function Navbar() {
                                       'block px-4 py-2 text-sm text-gray-700'
                                     )}
                                   >
-                                    Welcome {user.email}!
+                                    Welcome {authUser.email}!
                                   </div>
                                 )}
                               </Menu.Item>
@@ -173,7 +158,7 @@ export default function Navbar() {
                                 )}
                               </Menu.Item>
                             )}
-                            {(authenticate || userGoogle) && (
+                            {(authUser || userGoogle) && (
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
@@ -189,7 +174,7 @@ export default function Navbar() {
                                 )}
                               </Menu.Item>
                             )}
-                            {(authenticate || userGoogle) && (
+                            {(authUser || userGoogle) && (
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
@@ -205,7 +190,7 @@ export default function Navbar() {
                                 )}
                               </Menu.Item>
                             )}
-                            {(authenticate || userGoogle) && (
+                            {(authUser || userGoogle) && (
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
@@ -221,22 +206,22 @@ export default function Navbar() {
                                 )}
                               </Menu.Item>
                             )}
-                            {(authenticate || userGoogle) && (
-                               <Link to='/yourProfile/:id'>
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={logoutGoogle}
-                                    href='#'
-                                    className={classNames(
-                                      active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm text-gray-700'
-                                    )}
-                                  >
-                                    Your profile
-                                  </div>
-                                )}
-                              </Menu.Item>
+                            {(authUser || userGoogle) && (
+                              <Link to={`/yourProfile/${authUser?.id}`}>
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      onClick={logoutGoogle}
+                                      href='#'
+                                      className={classNames(
+                                        active ? 'bg-gray-100' : '',
+                                        'block px-4 py-2 text-sm text-gray-700'
+                                      )}
+                                    >
+                                      Your profile
+                                    </div>
+                                  )}
+                                </Menu.Item>
                               </Link>
                             )}
                             <Menu.Item>
@@ -293,9 +278,9 @@ export default function Navbar() {
                           {userGoogle.email}
                         </div>
                       )}
-                      {authenticate && (
+                      {authUser && (
                         <div className='text-sm font-medium leading-none text-gray-400'>
-                          {user.email}
+                          {authUser.email}
                         </div>
                       )}
                     </div>
@@ -308,14 +293,14 @@ export default function Navbar() {
                     </button>
                   </div>
                   <div className='mt-3 space-y-1 px-2'>
-                    {!authenticate && !userGoogle && (
+                    {!authUser && !userGoogle && (
                       <Link to={'/login'}>
                         <Disclosure.Button className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'>
                           Log in
                         </Disclosure.Button>
                       </Link>
                     )}
-                    {(authenticate || userGoogle) && (
+                    {(authUser || userGoogle) && (
                       <Disclosure.Button className='block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white'>
                         Log out
                       </Disclosure.Button>

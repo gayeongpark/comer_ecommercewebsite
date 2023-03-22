@@ -4,9 +4,12 @@ const User = require('../models/User.model');
 const router = express.Router();
 
 //get user
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', authenticatedUser, async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
     res.status(200).json(user);
   } catch (error) {
     next(error);
@@ -26,14 +29,14 @@ router.put('/update/:id', authenticatedUser, async (req, res, next) => {
       );
       console.log('Updated user:', updatedUser);
       if (!updatedUser) {
-        return next(createError(404, 'User not found'));
+        return res.status(404).json('User not found');
       }
       res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
     }
   } else {
-    return next(createError(403, 'You can update only your account!'));
+    return res.status(404).json('You can update only your account!');
   }
 });
 
@@ -47,7 +50,7 @@ router.delete('/delete/:id', authenticatedUser, async (req, res, next) => {
       next(error);
     }
   } else {
-    return next(createError(403, 'You can delete only your account!'));
+    return res.status(404).json('You can delete only your');
   }
 });
 

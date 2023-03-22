@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import axios from 'axios';
 import { setAuthUser } from '../../redux/authSlice';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 export default function Profile() {
   const [openInputImage, setOpenInputImage] = useState(false);
@@ -9,10 +11,57 @@ export default function Profile() {
   const [openInputEmail, setOpenInputEmail] = useState(false);
   const [openInputPhone, setOpenInputPhone] = useState(false);
   const [openInputAddress, setOpenInputAddress] = useState(false);
+  const [openInputIntro, setOpenInputIntro] = useState(false);
+
+  const [userProfile, setUserProfile] = useState('');
+
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    country: '',
+    city: '',
+    province: '',
+    zip: '',
+    street: '',
+    profilePicture: '',
+    description: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const authUser = useSelector((state) => state.authUser.value);
 
   const dispatch = useDispatch();
+
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await axios.get(`/users/${id}`);
+        setUserProfile(userData.data);
+      } catch (error) {}
+    };
+    fetchUserData();
+  }, [id, authUser]);
+
+  const handleUpdateUser = async (e) => {
+    try {
+      e.prevenDefault();
+      const response = await axios.put(`/users/update/${id}`, formData, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
+      const updatedUserData = response.data;
+      dispatch(setAuthUser(updatedUserData));
+    } catch (error) {
+      dispatch(setAuthUser(false));
+    }
+  };
+
   return (
     <div className='mx-auto mb-20 max-w-7xl px-4 sm:px-6 lg:px-8 overflow-hidden bg-white py-5 sm:rounded-lg'>
       <div className='px-4 py-6'>
@@ -29,21 +78,28 @@ export default function Profile() {
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Profile image</dt>
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              <span className='inline-block h-36 w-36 mb-2 overflow-hidden rounded-full bg-gray-100'>
-                <svg
-                  onClick={() => setOpenInputImage(!openInputImage)}
-                  className='flex h-full w-full text-gray-300'
-                  fill='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path d='M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z' />
-                </svg>
+              <span className='inline-block h-36 w-36 mb-2 overflow-hidden rounded-full'>
+                {authUser && (
+                  <img
+                    alt='profileImage'
+                    onClick={() => setOpenInputImage(!openInputImage)}
+                    className='flex h-full w-full text-gray-300'
+                    src='https://www.donut.app/assets/donut.png'
+                  ></img>
+                )}
               </span>
             </dd>
+            <input
+              type='file'
+              value={formData.profilePicture[0]}
+              onChange={handleChange}
+            />
+            <div className='font-medium text-red-600 cursor-pointer'>Edit</div>
             {openInputImage && (
               <div className='flex items-center space-x-4 mt-3 mt-4'>
                 <button
-                  type='button'
+                  type='submit'
+                  onSubmit={handleUpdateUser}
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
@@ -59,12 +115,12 @@ export default function Profile() {
               Hello, my name is GaYeong Park from Jeonju, South Korea.
             </dd>
             <div
-              onClick={() => setOpenInputEmail(!openInputEmail)}
+              onClick={() => setOpenInputIntro(!openInputEmail)}
               className='font-medium text-red-600 cursor-pointer'
             >
               Edit
             </div>
-            {openInputEmail && (
+            {openInputIntro && (
               <div className='col-span-6 sm:col-span-3'>
                 <label
                   htmlFor='description'
@@ -77,14 +133,17 @@ export default function Profile() {
                   name='description'
                   id='description'
                   autoComplete='off'
+                  value={formData.description}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
-            {openInputEmail && (
+            {openInputIntro && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
-                  type='button'
+                  type='submit'
+                  onSubmit={handleUpdateUser}
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
@@ -116,6 +175,8 @@ export default function Profile() {
                   name='first-name'
                   id='first-name'
                   autoComplete='given-name'
+                  value={formData.firstName}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -133,6 +194,8 @@ export default function Profile() {
                   name='last-name'
                   id='last-name'
                   autoComplete='family-name'
+                  value={formData.lastName}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -140,7 +203,8 @@ export default function Profile() {
             {openInputName && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
-                  type='button'
+                  type='submit'
+                  onSubmit={handleUpdateUser}
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
@@ -151,9 +215,12 @@ export default function Profile() {
 
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Email address</dt>
-            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              margotfoster@example.com
-            </dd>
+            {userProfile && (
+              <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
+                {userProfile.email}
+              </dd>
+            )}
+
             <div
               onClick={() => setOpenInputEmail(!openInputEmail)}
               className='font-medium text-red-600 cursor-pointer'
@@ -173,6 +240,8 @@ export default function Profile() {
                   name='last-name'
                   id='last-name'
                   autoComplete='family-name'
+                  value={formData.email}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -180,7 +249,8 @@ export default function Profile() {
             {openInputEmail && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
-                  type='button'
+                  type='submit'
+                  onSubmit={handleUpdateUser}
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
@@ -191,7 +261,7 @@ export default function Profile() {
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Phone Number</dt>
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              +82 10 1234 1234
+              82 10 1234 1234
             </dd>
             <div
               onClick={() => setOpenInputPhone(!openInputPhone)}
@@ -212,6 +282,8 @@ export default function Profile() {
                   name='phone-number'
                   id='phone-number'
                   autoComplete='off'
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -219,7 +291,8 @@ export default function Profile() {
             {openInputPhone && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
-                  type='button'
+                  type='submit'
+                  onSubmit={handleUpdateUser}
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
@@ -254,11 +327,11 @@ export default function Profile() {
                   id='country'
                   name='country'
                   autoComplete='country-name'
+                  value={formData.country}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
                   <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
                 </select>
               </div>
             )}
@@ -275,6 +348,8 @@ export default function Profile() {
                   name='city'
                   id='city'
                   autoComplete='address-level2'
+                  value={formData.city}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -292,6 +367,8 @@ export default function Profile() {
                   name='region'
                   id='region'
                   autoComplete='address-level1'
+                  value={formData.province}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -309,6 +386,8 @@ export default function Profile() {
                   name='postal-code'
                   id='postal-code'
                   autoComplete='postal-code'
+                  value={formData.zip}
+                  onChange={handleChange}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -326,6 +405,8 @@ export default function Profile() {
                   name='street-address'
                   id='street-address'
                   autoComplete='street-address'
+                  value={formData.street}
+                  onChange={handleChange}
                   className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -333,16 +414,17 @@ export default function Profile() {
             {openInputAddress && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
-                  type='button'
+                  type='submit'
+                  onSubmit={handleUpdateUser}
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
                 </button>
-                <div>
-                  Do you want to delete your account?
-                </div>
               </div>
             )}
+          </div>
+          <div className='flex px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6 cursor-pointer'>
+            Do you want to delete your account?
           </div>
         </dl>
       </div>

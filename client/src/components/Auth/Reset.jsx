@@ -23,6 +23,7 @@ export default function Reset() {
       password2,
     };
     await axios.post('/auth/resetPassword', response, {
+      headers: { 'Content-Type': 'application/json' },
       withCredentials: true,
     });
     navigate('/login');
