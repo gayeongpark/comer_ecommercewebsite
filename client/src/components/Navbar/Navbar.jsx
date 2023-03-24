@@ -7,6 +7,8 @@ import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setAuthUser } from '../../redux/authSlice';
 import { useSelector } from 'react-redux';
 
 function classNames(...classes) {
@@ -15,17 +17,23 @@ function classNames(...classes) {
 
 export default function Navbar() {
   const [userGoogle] = useAuthState(auth);
+  const dispatch = useDispatch();
 
   const authUser = useSelector((state) => state.authUser.value);
-  console.log(authUser)
+
 
   const logout = async () => {
-    const loggedOut = await axios.post('/auth/logout', {
-      headers: { 'Content-Type': 'application/json' },
-      withCredentials: true,
-    });
-    if (loggedOut) {
-      window.location.href = 'http://localhost:3000/login';
+    try {
+      const loggedOut = await axios.post('/auth/logout', {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
+      if (loggedOut) {
+        dispatch(setAuthUser(loggedOut));
+        window.location.href = 'http://localhost:3000/login';
+      }
+    } catch (error) {
+      dispatch(setAuthUser(false));
     }
   };
 

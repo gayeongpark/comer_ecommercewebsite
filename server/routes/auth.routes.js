@@ -65,7 +65,7 @@ router.post('/login', async (req, res, next) => {
         },
         process.env.REFRESH_SECRET,
         {
-          expiresIn: '6h',
+          expiresIn: '7d',
         }
       );
 
@@ -76,7 +76,7 @@ router.post('/login', async (req, res, next) => {
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        maxAge: 21600000,
+        maxAge: 604800000,
       });
     }
     const resData = {email: user.email, id: user.id};

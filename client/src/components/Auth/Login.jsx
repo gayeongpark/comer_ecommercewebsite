@@ -45,7 +45,7 @@ export default function Login() {
       //containing user in authUser selector
       navigate('/');
     } catch (error) {
-      setError(error.user);
+      setError(error.response?.data?.message);
       dispatch(setAuthUser(false));
     }
   };
