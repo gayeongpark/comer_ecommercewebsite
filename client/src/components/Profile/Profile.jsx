@@ -40,10 +40,9 @@ export default function Profile() {
     if (!file || file.type.substring(0, 5) !== 'image') {
       return; // ignore non-image files
     }
-    const name = e.target.name;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: file,
+      profilePicture: file,
     }));
   };
 
