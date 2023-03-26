@@ -37,9 +37,7 @@ export default function Profile() {
 
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
-    if (!file || file.type.substring(0, 5) !== 'image') {
-      return; // ignore non-image files
-    }
+    console.log(file);
     setFormData((prevFormData) => ({
       ...prevFormData,
       profilePicture: file,
@@ -66,13 +64,16 @@ export default function Profile() {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
-     
       const update = await axios.put(`/users/update/${id}`, formData, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
         withCredentials: true,
       });
       const updatedUserData = update.data;
       console.log(updatedUserData);
+      console.log(userProfile.profilePicture);
+      console.log('Updated image path:', updatedUserData.profilePicture);
       dispatch(setAuthUser(updatedUserData));
       setFormData((prevFormData) => ({
         ...prevFormData,
@@ -87,6 +88,7 @@ export default function Profile() {
         }, {}),
       }));
     } catch (error) {
+      console.error('Error updating user:', error);
       dispatch(setAuthUser(false));
     }
   };
@@ -108,28 +110,23 @@ export default function Profile() {
             <dt className='text-sm font-medium text-gray-500'>Profile image</dt>
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
               <span className='inline-block h-36 w-36 mb-2 overflow-hidden rounded-full'>
-                {userProfile.profilePicture ? (
-                  <img
-                    alt='Update profileImage'
-                    className='flex h-full w-full text-gray-300'
-                     src={userProfile.profilePicture}
-                  ></img>
-                ) : (
-                  <img
-                    alt='Update profileImage'
-                    className='flex h-full w-full text-gray-300'
-                    src='https://www.donut.app/assets/donut.png'
-                  ></img>
-                )}
+                <img
+                  alt='Update profileImage'
+                  className='flex h-full w-full text-gray-300'
+                  src={
+                    userProfile.profilePicture
+                      ? `http://localhost:8000/${userProfile.profilePicture}`
+                      : 'https://www.donut.app/assets/donut.png'
+                  }
+                ></img>
               </span>
             </dd>
             <input
               type='file'
+              name='profilePicture'
               accept='/image/*'
               onChange={handleProfileImageChange}
-              value={formData.profilePicture}
               onClick={() => setOpenInputImage(!openInputImage)}
-              className='flex'
             />
             {/* <div className='font-medium text-red-600 cursor-pointer'>Edit</div> */}
 

@@ -29,11 +29,14 @@ app.use(
   })
 );
 
+const path = require('path');
+app.use(express.static(path.join(__dirname, '')));
+
 const { v4: uuidv4 } = require('uuid');
 
 const PORT = process.env.PORT || 8000;
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server listening on the port http://localhost:${PORT}`);
 });
 

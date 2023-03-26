@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const authenticatedUser = require('../middleware/authMiddleware');
 const User = require('../models/User.model');
 const router = express.Router();
@@ -18,24 +19,76 @@ router.get('/:id', authenticatedUser, async (req, res, next) => {
 });
 
 //update user
-router.put('/update/:id', authenticatedUser, async (req, res, next) => {
-  try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: req.body,
-      },
-      { new: true }
-    );
-    console.log('Updated user:', updatedUser);
-    if (!updatedUser) {
-      return res.status(404).json('User not found');
-    }
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    next(error);
-  }
+
+//1. Defined a storage engine for Multer that specifies where uploaded files should be stored and what name they should be given.
+
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    // console.log('Destination:', file);
+    callback(null, 'public/profileImages/');
+  },
+  filename: (req, file, callback) => {
+    // console.log('Filename:', file);
+    callback(null, Date.now() + '-' + file.originalname);
+  },
 });
+
+//2. Created a Multer middleware that uses the storage engine and specifies that only image files should be accepted:
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, callback) => {
+    // console.log(req)
+    // console.log('File filter:', file);
+    if (
+      file.mimetype === 'image/png' ||
+      file.mimetype === 'image/jpg' ||
+      file.mimetype === 'image/jpeg'
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Only image files are allowed!'));
+    }
+  },
+});
+
+//3. If a file was uploaded, it will set the profilePicture field in the request body to the path of the uploaded file. The path of the uploaded file will be available in req.file.path.
+router.put(
+  '/update/:id',
+  authenticatedUser,
+
+  upload.single('profilePicture'), // Add this line to handle file uploads
+  async (req, res, next) => {
+    // console.log('PUT request received');
+    // console.log('Request file:', req.file);
+    try {
+      // If a file was uploaded, set the profilePicture field to the path of the uploaded file
+      if (req.file) {
+        req.body.profilePicture = req.file.path;
+      }
+      // console.log(req.file);
+
+      let imageUrl = req.file?.path?.replace(/\\/g, '/');
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: {
+            ...req.body,
+            profilePicture: imageUrl,
+          },
+        },
+        { new: true }
+      );
+      // console.log('Updated user:', updatedUser);
+      if (!updatedUser) {
+        return res.status(404).json('User not found');
+      }
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      console.log('Error:', error);
+      next(error);
+    }
+  }
+);
 
 //delete user
 router.delete('/delete/:id', authenticatedUser, async (req, res, next) => {
