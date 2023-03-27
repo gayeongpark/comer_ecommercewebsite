@@ -1,8 +1,13 @@
 const { Schema, model } = require('mongoose');
+// const User = require('./User.model');
 
-const experieceSchema = new Schema(
+const experienceSchema = new Schema(
   {
-    owner: { type: Schema.Types.ObjectId, ref: 'User' },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -65,10 +70,14 @@ const experieceSchema = new Schema(
       type: Number,
       required: true,
     },
+    tags: {
+      type: [String],
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-const Experiece = model('Experiece', experieceSchema);
+const Experience = model('Experience', experienceSchema);
 
-module.exports = Experiece;
+module.exports = Experience;

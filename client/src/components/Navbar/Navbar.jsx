@@ -20,7 +20,7 @@ export default function Navbar() {
   const dispatch = useDispatch();
 
   const authUser = useSelector((state) => state.authUser.value);
-
+  console.log(authUser);
 
   const logout = async () => {
     try {
@@ -95,14 +95,25 @@ export default function Navbar() {
                             </Menu.Button>
                           </div>
                         )}
-                        {authUser && (
+                        {authUser ? (
                           <div>
                             <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
-                                src='https://www.donut.app/assets/donut.png'
-                                alt=''
+                                src={`http://localhost:8000/${authUser.profilePicture}`}
+                                alt='Update profileImage'
+                              />
+                            </Menu.Button>
+                          </div>
+                        ) : (
+                          <div>
+                            <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
+                              <span className='sr-only'>Open user menu</span>
+                              <img
+                                className='h-8 w-8 rounded-full'
+                                src={'https://www.donut.app/assets/donut.png'}
+                                alt='Update profileImage'
                               />
                             </Menu.Button>
                           </div>
@@ -134,6 +145,7 @@ export default function Navbar() {
                                 </Menu.Item>
                               </Link>
                             )}
+
                             {authUser && (
                               <Menu.Item>
                                 {({ active }) => (
@@ -178,6 +190,22 @@ export default function Navbar() {
                                     )}
                                   >
                                     Log out
+                                  </div>
+                                )}
+                              </Menu.Item>
+                            )}
+                            {(authUser || userGoogle) && (
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <div
+                                    onClick={logout}
+                                    href='#'
+                                    className={classNames(
+                                      active ? 'bg-gray-100' : '',
+                                      'block px-4 py-2 text-sm text-gray-700'
+                                    )}
+                                  >
+                                    Message
                                   </div>
                                 )}
                               </Menu.Item>

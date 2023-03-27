@@ -37,7 +37,7 @@ export default function Profile() {
 
   const handleProfileImageChange = (e) => {
     const file = e.target.files[0];
-    console.log(file);
+    // console.log(file);
     setFormData((prevFormData) => ({
       ...prevFormData,
       profilePicture: file,
@@ -54,7 +54,6 @@ export default function Profile() {
     const fetchUserData = async () => {
       try {
         const userData = await axios.get(`/users/${id}`);
-        console.log(userData.data);
         setUserProfile(userData.data);
       } catch (error) {}
     };
@@ -71,9 +70,9 @@ export default function Profile() {
         withCredentials: true,
       });
       const updatedUserData = update.data;
-      console.log(updatedUserData);
-      console.log(userProfile.profilePicture);
-      console.log('Updated image path:', updatedUserData.profilePicture);
+      // console.log(updatedUserData);
+      // console.log(userProfile.profilePicture);
+      // console.log('Updated image path:', updatedUserData.profilePicture);
       dispatch(setAuthUser(updatedUserData));
       setFormData((prevFormData) => ({
         ...prevFormData,
@@ -311,7 +310,7 @@ export default function Profile() {
             {userProfile && (
               <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
                 {userProfile.zip}, {userProfile.street}, {userProfile.province},{' '}
-                {authUser.city}, {authUser.country}
+                {userProfile.city}, {userProfile.country}
               </dd>
             )}
 

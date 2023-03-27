@@ -79,7 +79,11 @@ router.post('/login', async (req, res, next) => {
         maxAge: 604800000,
       });
     }
-    const resData = {email: user.email, id: user.id};
+    const resData = {
+      email: user.email,
+      id: user.id,
+      profilePicture: user.profilePicture,
+    };
     // console.log(user)
 
     res.status(200).json(resData);
@@ -121,28 +125,6 @@ router.post('/refreshtoken', async (req, res, next) => {
     next(error);
   }
 });
-
-// router.get('/authenticatedUser', async (req, res, next) => {
-//   try {
-//     const accessToken = req.cookies['accessToken'];
-//     if (!accessToken) {
-//       return res.status(401).json('Access token not found!');
-//     }
-//     const payload = jwt.verify(accessToken, process.env.ACCESS_SECRET);
-
-//     if (!payload) {
-//       return res.status(406).json('Unauthorized!');
-//     }
-//     const user = await User.findOne({ email: payload.email });
-//     if (!user) {
-//       return res.status(406).json('Unauthorized!');
-//     }
-//     const { password, password2, ...others } = user._doc;
-//     res.status(200).json(others);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
 
 router.post('/logout', async (req, res, next) => {
   try {
