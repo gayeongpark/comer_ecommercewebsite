@@ -138,6 +138,13 @@ export default function Profile() {
                 >
                   Save
                 </button>
+                <button
+                  type='button'
+                  onClick={() => setOpenInputImage(false)}
+                  className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
+                >
+                  Cancel
+                </button>
               </div>
             )}
           </div>
@@ -249,6 +256,13 @@ export default function Profile() {
                 >
                   Save
                 </button>
+                <button
+                  type='button'
+                  onClick={() => setOpenInputName(false)}
+                  className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
+                >
+                  Cancel
+                </button>
               </div>
             )}
           </div>
@@ -301,6 +315,13 @@ export default function Profile() {
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
+                </button>
+                <button
+                  type='button'
+                  onClick={() => setOpenInputPhone(false)}
+                  className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
+                >
+                  Cancel
                 </button>
               </div>
             )}
@@ -425,6 +446,13 @@ export default function Profile() {
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
+                </button>
+                <button
+                  type='button'
+                  onClick={() => setOpenInputAddress(false)}
+                  className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
+                >
+                  Cancel
                 </button>
               </div>
             )}

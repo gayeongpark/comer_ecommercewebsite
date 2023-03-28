@@ -16,14 +16,14 @@ const experienceSchema = new Schema(
       type: String,
       required: true,
     },
-    typeOfFood: {
-      type: String,
-      required: true,
-    },
-    foodActivity: {
-      type: String,
-      required: true,
-    },
+    // typeOfFood: {
+    //   type: String,
+    //   required: true,
+    // },
+    // foodActivity: {
+    //   type: String,
+    //   required: true,
+    // },
     description: {
       type: String,
       required: true,
@@ -49,8 +49,9 @@ const experienceSchema = new Schema(
       required: true,
     },
     images: { type: [String], required: true },
+    likes: { type: [String], required: true },
     perks: { type: [String], required: true },
-    extraInfo: {
+    notice: {
       type: String,
       require: true,
     },

@@ -47,7 +47,9 @@ export default function Navbar() {
                 <div className='flex h-16 items-center justify-between'>
                   <div className='flex items-center'>
                     <div className='flex-shrink-0'>
+                      <Link to='/'>
                       <h1>Comer</h1>
+                      </Link>
                     </div>
                     <div className='hidden md:block'></div>
                   </div>
@@ -73,11 +75,11 @@ export default function Navbar() {
                       <Menu as='div' className='relative ml-3'>
                         {!userGoogle && !authUser && (
                           <div>
-                            <Menu.Button className='flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
+                            <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
-                                src='https://images.unsplash.com/photo-1468657988500-aca2be09f4c6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80'
+                                src='https://www.donut.app/assets/donut.png'
                                 alt=''
                               />
                             </Menu.Button>
@@ -85,7 +87,7 @@ export default function Navbar() {
                         )}
                         {userGoogle && (
                           <div>
-                            <Menu.Button className='flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
+                            <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
@@ -95,24 +97,13 @@ export default function Navbar() {
                             </Menu.Button>
                           </div>
                         )}
-                        {authUser ? (
+                        {authUser && (
                           <div>
                             <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
                                 src={`http://localhost:8000/${authUser.profilePicture}`}
-                                alt='Update profileImage'
-                              />
-                            </Menu.Button>
-                          </div>
-                        ) : (
-                          <div>
-                            <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
-                              <span className='sr-only'>Open user menu</span>
-                              <img
-                                className='h-8 w-8 rounded-full'
-                                src={'https://www.donut.app/assets/donut.png'}
                                 alt='Update profileImage'
                               />
                             </Menu.Button>
