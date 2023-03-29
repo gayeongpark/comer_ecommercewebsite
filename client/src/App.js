@@ -9,6 +9,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import MyProfile from './pages/MyProfile';
 import Hosting from './pages/HostingExperience';
+// import ProfileSK from './components/Profile/ProfileSK';
 
 export default function App() {
   return (
