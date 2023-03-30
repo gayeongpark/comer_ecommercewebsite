@@ -1,11 +1,11 @@
 const express = require('express');
 const multer = require('multer');
-const authenticatedUser = require('../middleware/authMiddleware');
+const { authenticateUser } = require('../middleware/authMiddleware.js');
 const User = require('../models/User.model');
 const router = express.Router();
 
 //get user
-router.get('/:id', authenticatedUser, async (req, res, next) => {
+router.get('/:id', authenticateUser, async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -54,7 +54,7 @@ const upload = multer({
 //3. If a file was uploaded, it will set the profilePicture field in the request body to the path of the uploaded file. The path of the uploaded file will be available in req.file.path.
 router.put(
   '/update/:id',
-  authenticatedUser,
+  authenticateUser,
 
   upload.single('profilePicture'), // Add this line to handle file uploads
   async (req, res, next) => {
@@ -91,7 +91,7 @@ router.put(
 );
 
 //delete user
-router.delete('/delete/:id', authenticatedUser, async (req, res, next) => {
+router.delete('/delete/:id', authenticateUser, async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 

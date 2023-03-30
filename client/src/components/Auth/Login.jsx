@@ -45,7 +45,7 @@ export default function Login() {
       //containing user in authUser selector
       navigate('/');
     } catch (error) {
-      setError(error.response?.data?.message);
+      setError(error.response.data);
       dispatch(setAuthUser(false));
     }
   };
@@ -146,7 +146,7 @@ export default function Login() {
               >
                 Continue
               </button>
-              {error && error}
+              <div className='text-red-600 mt-2'>{error && error}</div>
               <div className='mx-auto max-w-2xl text-center'>
                 <p className='mt-8 text-md leading-8 text-gray-600'>
                   Don't have an Account?{' '}

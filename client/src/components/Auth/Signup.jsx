@@ -186,7 +186,7 @@ export default function Signup() {
             >
               Continue
             </button>
-            {error && error}
+            <div className='text-red-600 mt-2'>{error && error}</div>
             <div className='mx-auto max-w-2xl text-center'>
               <p className='mt-8 text-md leading-8 text-gray-600'>
                 Alreay have an account?{' '}

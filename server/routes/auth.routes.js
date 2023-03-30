@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
+const { verifyEmail } = require('../middleware/authMiddleware.js');
 const User = require('../models/User.model.js');
 const Reset = require('../models/Reset.model.js');
 const router = express.Router();
@@ -21,19 +22,70 @@ router.post('/signup', async (req, res, next) => {
     if (user) {
       return res.status(404).json('User already registered.');
     }
+    const token = crypto.randomBytes(32).toString('hex');
     const newUser = new User({
       email: req.body.email,
       password: hash,
       password2: hash2,
+      emailToken: token,
+      isVerified: false,
     });
     await newUser.save();
+
+    //I can revise that into comers' email acount like this below
+    // const transporter = nodemailer.createTransport({
+    //   service: 'gmail',
+    //   host: 'smtp.gmail.com',
+    //   port: 587,
+    //   secure: false,
+    //   auth: {
+    //     user: process.env.NODEMAILER_USER,
+    //     pass: process.env.NODEMAILER_PASS,
+    //   },
+    //   tls: {
+    //     rejectUnauthorized: false,
+    //   },
+    // });
+    const transporter = nodemailer.createTransport({
+      host: '0.0.0.0',
+      port: 1025,
+    });
+    const url = `http://localhost:3000/emailVerification/${token}`;
+    await transporter.sendMail({
+      from: `"Comer Team" <${process.env.NODEMAILER_USER}>`,
+      to: newUser.email,
+      subject: 'Important: verify your email to use Comer',
+      html: `<h1>Hello user!</h1> <div>Comer received a request to create an account for you.</div> <div>Before we proceed, we need you to verify the email address you provided.</div> <div>Click <a href='${url}'>here</a> to verify your email.</div> <div>Thank you,</div> <div>Comer</div>`,
+    });
     res.status(200).json('Welcome to Comer!');
   } catch (error) {
     next(error);
   }
 });
 
-router.post('/login', async (req, res, next) => {
+//The reason you need to update the emailToken to null is to ensure that the token can only be used once for email verification. Once a user's email has been verified, the emailToken should no longer be valid or usable.
+//By setting the emailToken to null, you are essentially deleting the token and preventing any further use of that specific token for email verification.
+//This ensures that a user's email can only be verified once, and helps to prevent potential security issues that could arise if an email verification token were to remain valid after a user's email had already been verified.
+router.get('/verifyEmail/:token', async (req, res, next) => {
+  try {
+    const emailToken = req.params.token;
+    const user = await User.findOneAndUpdate(
+      { emailToken: emailToken },
+      { isVerified: true, emailToken: null },
+      { new: true }
+    );
+    console.log(user);
+    if (user) {
+      res.status(200).json('Your email is verified!');
+    } else {
+      res.status(404).json('User not found!');
+    }
+  } catch (error) {
+    res.status(500).json('Server Error!');
+  }
+});
+
+router.post('/login', verifyEmail, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -142,10 +194,10 @@ router.post('/forgotPassword', async (req, res, next) => {
     const token = crypto.randomBytes(32).toString('hex');
     // res.send(token);
     //This is random string
-    const existingReset = await Reset.findOne({ email });
-    if (existingReset) {
-      // Email already exists, handle the error
-      return res.status(400).json('This email has already been reset');
+    const user = await Reset.findOne({ email });
+    if (user) {
+      // Email already exists, delete the existing reset to allow for a new one
+      await user.deleteOne();
     } else {
       // Email doesn't exist, save the reset
       const newReset = new Reset({
@@ -187,16 +239,17 @@ router.post('/resetPassword', async (req, res, next) => {
       return res.status(400).json('User not found');
     }
     const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
-    const hash2 = bcrypt.hashSync(req.body.password2, salt);
+    const hash = bcrypt.hashSync(password, salt);
+    // Update the user's password
     await User.updateOne(
       { _id: user._id },
       {
         password: hash,
-        password2: hash2,
       }
     );
-    res.status(202).json('Completely update it!');
+    // Delete the reset token to prevent it from being used again
+    await resetPassword.deleteOne();
+    res.status(202).json('Password updated successfully!');
   } catch (error) {
     next(error);
   }

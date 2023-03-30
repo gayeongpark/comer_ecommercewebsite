@@ -25,4 +25,21 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
-module.exports = authenticateUser;
+const verifyEmail = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user.isVerified) {
+      next();
+    } else {
+      return res
+        .status(406)
+        .json('please check your email inbox to verify your account!');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { authenticateUser, verifyEmail };
+
+// module.exports = authenticateUser;

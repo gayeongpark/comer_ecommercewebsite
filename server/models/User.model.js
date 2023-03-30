@@ -31,6 +31,11 @@ const userSchema = new Schema(
     zip: { type: Number },
     street: { tpye: String },
     description: { type: String },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailToken: { type: String },
   },
   { timestamps: true }
 );

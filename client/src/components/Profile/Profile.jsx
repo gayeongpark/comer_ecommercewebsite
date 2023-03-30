@@ -5,6 +5,8 @@ import axios from 'axios';
 import { setAuthUser } from '../../redux/authSlice';
 import { Link, useParams } from 'react-router-dom';
 import ProfileSK from './ProfileSK';
+// import PhoneInput from 'react-phone-input-2';
+// import 'react-phone-input-2/lib/style.css';
 
 export default function Profile() {
   const [openInputImage, setOpenInputImage] = useState(false);
@@ -31,6 +33,7 @@ export default function Profile() {
   });
 
   const handleChange = (e) => {
+    console.log({e})
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -353,12 +356,14 @@ export default function Profile() {
               </div>
               <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
                 <dt className='text-sm font-medium text-gray-500'>Address</dt>
-                {userProfile && (
+                {userProfile.country ? (
                   <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
                     {userProfile.zip}, {userProfile.street},{' '}
                     {userProfile.province}, {userProfile.city},{' '}
                     {userProfile.country}
                   </dd>
+                ) : (
+                  <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'></dd>
                 )}
 
                 <div

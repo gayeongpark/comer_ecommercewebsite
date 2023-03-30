@@ -4,11 +4,7 @@ import axios from 'axios';
 
 export default function Forgot() {
   const [email, setEmail] = useState('');
-  const [notify, setNotify] = useState({
-    show: false,
-    error: false,
-    message: '',
-  });
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,17 +17,8 @@ export default function Forgot() {
           withCredentials: true,
         }
       );
-      setNotify({
-        show: true,
-        error: false,
-        message: 'Please check out your email box',
-      });
     } catch (error) {
-      setNotify({
-        show: true,
-        error: true,
-        message: 'Please check out your email address!',
-      });
+      setError(error.response.data)
     }
   };
   return (
@@ -77,7 +64,9 @@ export default function Forgot() {
               >
                 Submit
               </button>
-              <div>{notify.show && notify.message}</div>
+              <div>
+              {error && error}
+                </div>
             </div>
           </form>
         </div>
