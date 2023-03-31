@@ -136,15 +136,19 @@ export default function Header() {
                   </span>
                   {openDate && (
                     <DateRange
+                      rangeColors={['#262626']}
                       editableDateInputs={true}
                       onChange={(item) => setDate([item.selection])}
                       moveRangeOnFirstSelection={false}
+                      showDateDisplay={false}
+                      minDate={new Date()}
+                      direction='vertical'
                       ranges={date}
-                      className='absolute top-16 z-40'
+                      className='absolute bottom-20'
                     />
                   )}
                 </div>
-                  
+
                 <div className='border-l border-gray-300'></div>
                 <div className='flex text-lg items-center gap-1.5'>
                   <SlPeople className='text-gray-300' />

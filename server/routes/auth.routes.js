@@ -33,31 +33,41 @@ router.post('/signup', async (req, res, next) => {
     await newUser.save();
 
     //I can revise that into comers' email acount like this below
+    // let testAccount = await nodemailer.createTestAccount()
     // const transporter = nodemailer.createTransport({
     //   service: 'gmail',
-    //   host: 'smtp.gmail.com',
-    //   port: 587,
-    //   secure: false,
+    //   // port: 587,
+    //   // secure: false,
     //   auth: {
     //     user: process.env.NODEMAILER_USER,
     //     pass: process.env.NODEMAILER_PASS,
     //   },
-    //   tls: {
-    //     rejectUnauthorized: false,
-    //   },
+    //   // tls: {
+    //   //   rejectUnauthorized: false,
+    //   // },
     // });
+
     const transporter = nodemailer.createTransport({
       host: '0.0.0.0',
       port: 1025,
     });
     const url = `http://localhost:3000/emailVerification/${token}`;
-    await transporter.sendMail({
-      from: `"Comer Team" <${process.env.NODEMAILER_USER}>`,
-      to: newUser.email,
-      subject: 'Important: verify your email to use Comer',
-      html: `<h1>Hello user!</h1> <div>Comer received a request to create an account for you.</div> <div>Before we proceed, we need you to verify the email address you provided.</div> <div>Click <a href='${url}'>here</a> to verify your email.</div> <div>Thank you,</div> <div>Comer</div>`,
-    });
-    res.status(200).json('Welcome to Comer!');
+    try {
+      await transporter.sendMail({
+        from: `"Comer Team" <${process.env.NODEMAILER_USER}>`,
+        to: newUser.email,
+        subject: 'Important: verify your email to use Comer',
+        html: `<h1>Hello user!</h1> <div>Comer received a request to create an account for you.</div> <div>Before we proceed, we need you to verify the email address you provided.</div> <div>Click <a href='${url}'>here</a> to verify your email.</div> <div></div> <div>Thank you,</div> <div>Comer</div>`,
+      });
+    } catch (error) {
+      await newUser.remove();
+      return res
+        .status(500)
+        .json('Failed to send email verification. Please try again later.');
+    }
+    res
+      .status(200)
+      .json('Welcome to Comer! Please check out your email inbox.');
   } catch (error) {
     next(error);
   }

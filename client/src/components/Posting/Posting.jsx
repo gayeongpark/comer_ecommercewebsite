@@ -64,8 +64,8 @@ export default function Posting() {
               accept='/image/*'
               onClick={() => setOpenInputImage(!openInputImage)}
             />
-            {/* <div className='font-medium text-red-600 cursor-pointer'>Edit</div> */}
 
+            {/* <div className='font-medium text-red-600 cursor-pointer'>Edit</div> */}
             {openInputImage && (
               <div className='flex items-center space-x-4 mt-3 mt-4'>
                 <button
@@ -1035,6 +1035,14 @@ export default function Posting() {
             )}
           </div>
         </dl>
+      </div>
+      <div className='flex justify-center mt-4'>
+        <button
+          type='submit'
+          className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+        >
+          Submit
+        </button>
       </div>
     </div>
   );
