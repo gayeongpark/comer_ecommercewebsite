@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { HiOutlinePhotograph } from 'react-icons/hi';
 
 export default function Posting() {
   const [openInputImage, setOpenInputImage] = useState(false);
@@ -16,20 +17,24 @@ export default function Posting() {
   const [openInputTags, setOpenInputTags] = useState(false);
 
   const [tags, setTags] = useState([]);
+  const [inputValue, setInputValue] = useState('');
 
   const handleSaveTags = (event) => {
     event.preventDefault();
-    // Do something with the tags, for example, update a database
-    console.log('Tags:', tags);
-    setOpenInputTags(false);
+    if (inputValue.trim() !== '') {
+      setTags([...tags, inputValue]);
+      setInputValue('');
+    }
   };
 
-  const handleKeyDown = (e) => {
-    e.preventDefault();
-    if (e.key !== 'Enter') return;
-    const value = e.target.value;
-    if (!value.trim()) return;
-    setTags([...tags, value]);
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSaveTags(event);
+    }
+  };
+
+  const handleDeleteTag = (index) => {
+    setTags(tags.filter((_, i) => i !== index));
   };
 
   return (
@@ -45,25 +50,38 @@ export default function Posting() {
       {/* image */}
       <div className='w-2/3'>
         <dl>
-          <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
+          <div className='border-b py-5 sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>
               Experience image
             </dt>
-            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              <span className='inline-block h-36 w-36 mb-2 overflow-hidden rounded-full'>
-                <img
-                  alt='Update profileImage'
-                  className='flex h-full w-full text-gray-300'
-                  src=''
-                ></img>
-              </span>
-            </dd>
-            <input
-              type='file'
-              name='profilePicture'
-              accept='/image/*'
-              onClick={() => setOpenInputImage(!openInputImage)}
-            />
+            <div className='flex mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10'>
+              <div className='text-center'>
+                <HiOutlinePhotograph
+                  className='mx-auto h-12 w-12 text-gray-300'
+                  aria-hidden='true'
+                />
+                <div className='mt-4 flex text-sm leading-6 text-gray-600'>
+                  <label
+                    htmlFor='file-upload'
+                    className='relative cursor-pointer rounded-md bg-white font-semibold text-red-600 '
+                  >
+                    <span onClick={() => setOpenInputImage(!openInputImage)}>
+                      Upload files
+                    </span>
+                    <input
+                      id='file-upload'
+                      name='file-upload'
+                      type='file'
+                      className='sr-only'
+                    />
+                  </label>
+                  <p className='pl-1'>or drag and drop</p>
+                </div>
+                <p className='text-xs leading-5 text-gray-600'>
+                  PNG, JPG, GIF up to 10MB
+                </p>
+              </div>
+            </div>
 
             {/* <div className='font-medium text-red-600 cursor-pointer'>Edit</div> */}
             {openInputImage && (
@@ -73,6 +91,13 @@ export default function Posting() {
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save
+                </button>
+                <button
+                  type='button'
+                  onClick={() => setOpenInputImage(false)}
+                  className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
+                >
+                  Cancel
                 </button>
               </div>
             )}
@@ -99,7 +124,9 @@ export default function Posting() {
                 >
                   Title
                 </label>
-                <div>Plase input the catched title of your activity</div>
+                <div className='text-gray-500'>
+                  please input the catched title of your activity
+                </div>
                 <input
                   type='text'
                   name='firstName'
@@ -149,7 +176,9 @@ export default function Posting() {
                 >
                   Description
                 </label>
-                <div>Please add detailed information about your activity</div>
+                <div className='text-gray-500'>
+                  Please add detailed information about your activity
+                </div>
                 <textarea
                   type='text'
                   name='description'
@@ -201,6 +230,9 @@ export default function Posting() {
                 >
                   Type of perks
                 </label>
+                <div className='text-gray-500'>
+                  please add what you would offer to your guests
+                </div>
                 <select
                   id='country'
                   name='country'
@@ -334,9 +366,9 @@ export default function Posting() {
                 >
                   Minimum age of the guest
                 </label>
-                <div>
-                  Set age limits for guests. Minors can only attend with their
-                  legal guardian.
+                <div className='text-gray-500'>
+                  please set age limits for guests. Minors can only attend with
+                  their legal guardian.
                 </div>
                 <select
                   id='age'
@@ -389,13 +421,14 @@ export default function Posting() {
                 </div>
                 <label
                   htmlFor='age'
-                  className='block text-sm font-medium leading-6 text-gray-900'
+                  className='block mt-6 text-sm font-medium leading-6 text-gray-900'
                 >
                   Maximum group size
                 </label>
-                <div>
-                  Set age limits for size of group. Remember: If only one person
-                  books, you'll still be expected to host. legal guardian.
+                <div className='text-gray-500'>
+                  please set age limits for size of group. Remember: If only one
+                  person books, you'll still be expected to host. legal
+                  guardian.
                 </div>
                 <select
                   id='size'
@@ -458,7 +491,9 @@ export default function Posting() {
                 >
                   Language
                 </label>
-                <div>Set language that you can speak for guests.</div>
+                <div className='text-gray-500'>
+                  please set language that you can speak for guests.
+                </div>
                 <select
                   id='time'
                   name='time'
@@ -514,7 +549,9 @@ export default function Posting() {
                 >
                   Experience start time
                 </label>
-                <div>Set time experience start time for guests.</div>
+                <div className='text-gray-500'>
+                  please set time experience start time for guests.
+                </div>
                 <select
                   id='time'
                   name='time'
@@ -573,11 +610,13 @@ export default function Posting() {
                 </select>
                 <label
                   htmlFor='age'
-                  className='block text-sm font-medium leading-6 text-gray-900'
+                  className='mt-6 block text-sm font-medium leading-6 text-gray-900'
                 >
                   Experience end time
                 </label>
-                <div>Set time experience end time for guests.</div>
+                <div className='text-gray-500'>
+                  please set time experience end time for guests.
+                </div>
                 <select
                   id='time'
                   name='time'
@@ -657,18 +696,28 @@ export default function Posting() {
           {/* Tag */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Tags</dt>
-
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              {tags}
+              {tags.map((tag, index) => (
+                <div
+                  key={index}
+                  className='inline-flex items-center justify-center py-1 px-2 bg-gray border rounded-full'
+                >
+                  <span className='mr-2'>{tag}</span>
+                  <span
+                    onClick={() => handleDeleteTag(index)}
+                    className='inline-flex items-center justify-center w-5 h-5 pb-1 border rounded-full bg-red-600 text-white text-lg cursor-pointer'
+                  >
+                    &times;
+                  </span>
+                </div>
+              ))}
             </dd>
-
             <div
               onClick={() => setOpenInputTags(!openInputTags)}
               className='font-medium text-red-600 cursor-pointer'
             >
               Edit
             </div>
-
             {openInputTags && (
               <form
                 onSubmit={handleSaveTags}
@@ -680,30 +729,26 @@ export default function Posting() {
                 >
                   Tags
                 </label>
-                <div>Please input relevant tags about your experience</div>
-                <div className='absolute z-50 my-3.5 mx-2 py-1 px-2 bg-gray border-2 rounded-full'>
-                  <span className='mr-2'>Hello</span>
-                  <span className='text-red-600 text-lg'>&times;</span>
+                <div className='text-gray-500'>
+                  Please input relevant tags about your experience up to six
                 </div>
-                {/* {tags?.map(tags, index) => (
-
-                )} */}
                 <div className='relative mt-2'>
+                  <div className='absolute top-0 items-center justify-center left-0 flex flex-wrap items-center p-1'></div>
                   <input
                     type='text'
                     id='tags'
                     onKeyDown={handleKeyDown}
-                    value={tags}
-                    onChange={(event) => setTags(event.target.value)}
+                    placeholder='please enter to add tags'
+                    value={inputValue}
+                    onChange={(event) => setInputValue(event.target.value)}
                     autoComplete='off'
                     className='block w-full rounded-md p-4 border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 focus:ring-opacity-50 focus:ring-2 sm:text-sm'
                   />
                 </div>
-
                 <div className='flex items-center space-x-4 mt-4'>
                   <button
                     type='submit'
-                    className='inline-flex items-center px-6 py-2 text-md font-medium text-white bg-red-700 rounded-md shadow-sm hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                    className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                   >
                     Save
                   </button>
@@ -741,6 +786,7 @@ export default function Posting() {
                 >
                   Price
                 </label>
+                <div className='text-gray-500'>please set the price</div>
                 <div className='relative mt-2 rounded-md shadow-sm'>
                   <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
                     <span className='text-gray-500 sm:text-sm'>$</span>
@@ -889,7 +935,7 @@ export default function Posting() {
             )}
             {openInputAddress && (
               <div className='flex items-center space-x-4 mt-4'>
-                <button
+               <button
                   type='submit'
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
@@ -905,6 +951,7 @@ export default function Posting() {
               </div>
             )}
           </div>
+
           {/* Notice */}
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Notice</dt>
@@ -925,8 +972,8 @@ export default function Posting() {
                 >
                   Notice
                 </label>
-                <div>
-                  Please add detailed notice that your guest should be informed
+                <div className='text-gray-500'>
+                  please add detailed notice that your guest should be informed
                 </div>
                 <textarea
                   type='text'
@@ -979,7 +1026,9 @@ export default function Posting() {
                 >
                   Cancellation policy
                 </label>
-                <div>Choose a cancellation policy</div>
+                <div className='text-gray-500'>
+                  please choose a cancellation policy
+                </div>
                 <div className='mt-6 space-y-6'>
                   <div className='flex items-center gap-x-3'>
                     <input
@@ -1036,10 +1085,10 @@ export default function Posting() {
           </div>
         </dl>
       </div>
-      <div className='flex justify-center mt-4'>
+      <div className='flex items-center space-x-4 mt-4'>
         <button
           type='submit'
-          className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+          className='rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
         >
           Submit
         </button>

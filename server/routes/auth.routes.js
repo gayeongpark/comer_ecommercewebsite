@@ -73,8 +73,8 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
-//The reason you need to update the emailToken to null is to ensure that the token can only be used once for email verification. Once a user's email has been verified, the emailToken should no longer be valid or usable.
-//By setting the emailToken to null, you are essentially deleting the token and preventing any further use of that specific token for email verification.
+//The reason I need to update the emailToken to null is to ensure that the token can only be used once for email verification. Once a user's email has been verified, the emailToken should no longer be valid or usable.
+//By setting the emailToken to null, I am essentially deleting the token and preventing any further use of that specific token for email verification.
 //This ensures that a user's email can only be verified once, and helps to prevent potential security issues that could arise if an email verification token were to remain valid after a user's email had already been verified.
 router.get('/verifyEmail/:token', async (req, res, next) => {
   try {
