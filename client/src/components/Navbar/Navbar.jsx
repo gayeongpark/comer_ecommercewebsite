@@ -73,14 +73,14 @@ export default function Navbar() {
 
                       {/* Profile dropdown */}
                       <Menu as='div' className='relative ml-3'>
-                        {(!authUser || !userGoogle) && (
+                        {!authUser && (
                           <div>
                             <Menu.Button className='flex max-w-xs items-center rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-red-800'>
                               <span className='sr-only'>Open user menu</span>
                               <img
                                 className='h-8 w-8 rounded-full'
                                 src='https://www.donut.app/assets/donut.png'
-                                alt=''
+                                alt='profileImage'
                               />
                             </Menu.Button>
                           </div>
@@ -92,7 +92,7 @@ export default function Navbar() {
                               <img
                                 className='h-8 w-8 rounded-full'
                                 src={userGoogle.photoURL}
-                                alt=''
+                                alt='profileImage'
                               />
                             </Menu.Button>
                           </div>

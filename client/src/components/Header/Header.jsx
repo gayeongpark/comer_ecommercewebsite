@@ -7,7 +7,7 @@ import { FaCalendarDay } from 'react-icons/fa';
 import { SlPeople } from 'react-icons/sl';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css files
-import { DateRange } from 'react-date-range';
+import { DateRangePicker } from 'react-date-range';
 import { format } from 'date-fns';
 
 export default function Header() {
@@ -135,17 +135,15 @@ export default function Header() {
                     ${format(date[0].endDate, 'MM/dd/yyyy')}`}
                   </span>
                   {openDate && (
-                    <DateRange
-                      rangeColors={['#262626']}
-                      editableDateInputs={true}
+                    <div className='z-40'>
+                    <DateRangePicker
+                      rangeColors={['#b91c1c']}
                       onChange={(item) => setDate([item.selection])}
-                      moveRangeOnFirstSelection={false}
-                      showDateDisplay={false}
                       minDate={new Date()}
-                      direction='vertical'
                       ranges={date}
-                      className='absolute bottom-20'
+                      className='absolute top-16'
                     />
+                    </div>
                   )}
                 </div>
 

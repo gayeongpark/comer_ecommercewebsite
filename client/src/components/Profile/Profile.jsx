@@ -487,9 +487,11 @@ export default function Profile() {
                   </div>
                 )}
               </div>
+              <Link to={`/deleteAccount/${userProfile?.id}`}>
               <div className='flex px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6 cursor-pointer'>
                 Do you want to delete your account?
               </div>
+              </Link>
             </dl>
           </div>
         </div>

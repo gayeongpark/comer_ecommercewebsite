@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlinePhotograph } from 'react-icons/hi';
+import { DateRangePicker } from 'react-date-range';
+import { format } from 'date-fns';
 
 export default function Posting() {
   const [openInputImage, setOpenInputImage] = useState(false);
@@ -16,8 +18,23 @@ export default function Posting() {
   const [openInputLanguage, setOpenInputLanguage] = useState(false);
   const [openInputTags, setOpenInputTags] = useState(false);
 
+  const [title, setTitle] = useState();
+
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
   const [tags, setTags] = useState([]);
   const [inputValue, setInputValue] = useState('');
+
+  const handleSelect = (ranges) => {
+    setStartDate(ranges.selection.startDate);
+    setEndDate(ranges.selection.endDate);
+  };
+  const selectionRange = {
+    startDate: startDate,
+    endDate: endDate,
+    key: 'selection',
+  };
 
   const handleSaveTags = (event) => {
     event.preventDefault();
@@ -102,14 +119,13 @@ export default function Posting() {
               </div>
             )}
           </div>
+
           {/* Title */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Title</dt>
-
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              Enjoy Miami's Sunset with Luxury Picnic By the Water
+              {title}
             </dd>
-
             <div
               onClick={() => setOpenInputTitle(!openInputTitle)}
               className='font-medium text-red-600 cursor-pointer'
@@ -119,7 +135,7 @@ export default function Posting() {
             {openInputTitle && (
               <div className='col-span-6 sm:col-span-3'>
                 <label
-                  htmlFor='firstName'
+                  htmlFor='title'
                   className='block text-sm font-medium leading-6 text-gray-900'
                 >
                   Title
@@ -129,10 +145,12 @@ export default function Posting() {
                 </div>
                 <input
                   type='text'
-                  name='firstName'
-                  id='firstName'
+                  name='title'
+                  id='title'
                   autoComplete='off'
-                  className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
@@ -145,7 +163,7 @@ export default function Posting() {
                   Save
                 </button>
                 <button
-                  type='button'
+                  type='cancel'
                   onClick={() => setOpenInputTitle(false)}
                   className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
                 >
@@ -154,6 +172,7 @@ export default function Posting() {
               </div>
             )}
           </div>
+
           {/* What you'll do */}
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>
@@ -184,7 +203,7 @@ export default function Posting() {
                   name='description'
                   id='description'
                   autoComplete='off'
-                  className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                  className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
@@ -206,6 +225,7 @@ export default function Posting() {
               </div>
             )}
           </div>
+
           {/* What's includes */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>
@@ -231,7 +251,7 @@ export default function Posting() {
                   Type of perks
                 </label>
                 <div className='text-gray-500'>
-                  please add what you would offer to your guests
+                  please add what you will offer to your guests
                 </div>
                 <select
                   id='country'
@@ -252,7 +272,7 @@ export default function Posting() {
                     name='description'
                     id='description'
                     autoComplete='off'
-                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
                 <select
@@ -274,7 +294,7 @@ export default function Posting() {
                     name='description'
                     id='description'
                     autoComplete='off'
-                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
                 <select
@@ -296,7 +316,7 @@ export default function Posting() {
                     name='description'
                     id='description'
                     autoComplete='off'
-                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
                 <select
@@ -318,7 +338,7 @@ export default function Posting() {
                     name='description'
                     id='description'
                     autoComplete='off'
-                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
               </div>
@@ -532,7 +552,9 @@ export default function Posting() {
             </dt>
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              Start time: 13:00 AM, end time: 15:00
+              Time: Date:{' '}
+              {`${format(startDate, 'MM/dd/yyyy')} to 
+                    ${format(endDate, 'MM/dd/yyyy')}`}
             </dd>
 
             <div
@@ -547,7 +569,7 @@ export default function Posting() {
                   htmlFor='age'
                   className='block text-sm font-medium leading-6 text-gray-900'
                 >
-                  Experience start time
+                  Start time
                 </label>
                 <div className='text-gray-500'>
                   please set time experience start time for guests.
@@ -612,7 +634,7 @@ export default function Posting() {
                   htmlFor='age'
                   className='mt-6 block text-sm font-medium leading-6 text-gray-900'
                 >
-                  Experience end time
+                  End time
                 </label>
                 <div className='text-gray-500'>
                   please set time experience end time for guests.
@@ -673,6 +695,23 @@ export default function Posting() {
                   <option value='11:00 PM'>11:00 PM</option>
                   <option value='11:30 PM'>11:30 PM</option>
                 </select>
+                <label
+                  htmlFor='date'
+                  className='mt-6 block text-sm font-medium leading-6 text-gray-900'
+                >
+                  Date range
+                </label>
+                <div className='text-gray-500'>
+                  please set date range for posting of your experience.
+                </div>
+                <div className='mt-6'>
+                  <DateRangePicker
+                    ranges={[selectionRange]}
+                    minDate={new Date()}
+                    rangeColors={['#b91c1c']}
+                    onChange={handleSelect}
+                  />
+                </div>
               </div>
             )}
             {openInputTime && (
@@ -742,7 +781,7 @@ export default function Posting() {
                     value={inputValue}
                     onChange={(event) => setInputValue(event.target.value)}
                     autoComplete='off'
-                    className='block w-full rounded-md p-4 border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 focus:ring-opacity-50 focus:ring-2 sm:text-sm'
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
                 <div className='flex items-center space-x-4 mt-4'>
@@ -935,7 +974,7 @@ export default function Posting() {
             )}
             {openInputAddress && (
               <div className='flex items-center space-x-4 mt-4'>
-               <button
+                <button
                   type='submit'
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
@@ -980,7 +1019,7 @@ export default function Posting() {
                   name='description'
                   id='description'
                   autoComplete='off'
-                  className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+                  className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
