@@ -81,7 +81,7 @@ router.get('/verifyEmail/:token', async (req, res, next) => {
     const emailToken = req.params.token;
     const user = await User.findOneAndUpdate(
       { emailToken: emailToken },
-      { isVerified: true, emailToken: null },
+      { isVerified: true, isActive: true, emailToken: null },
       { new: true }
     );
     console.log(user);
@@ -99,6 +99,7 @@ router.post('/login', verifyEmail, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    console.log(user);
     if (!user) {
       return res.status(404).json('This user was not registered!');
     }

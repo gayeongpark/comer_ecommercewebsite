@@ -41,26 +41,31 @@ export default function Footer() {
             <p className='mb-3 font-light cursor-pointer'>Report concerns</p>
           </div>
         </div>
-        <div className='flex justify-between mx-auto max-w-2xl py-3 px-4 sm:py-6 sm:px-6 lg:max-w-7xl lg:px-8'>
+        <div className='flex flex-col justify-between mx-auto max-w-2xl px-4 py-3 sm:flex-row sm:px-6 sm:py-6 lg:max-w-7xl lg:px-8'>
           <div className='flex gap-3'>
             <div>© 2023 Comer, Inc</div>
-            <div className='flex cursor-pointer gap-3'>
-              <div>·</div> Terms
+            <div className='flex items-center gap-3 cursor-pointer'>
+              <div>·</div>
+              <span className='sm:hidden'>Terms</span>
+              <span className='hidden sm:inline'>Terms &amp; Conditions</span>
             </div>
-            <div className='flex cursor-pointer gap-3'>
-              <div>·</div> privacy
+            <div className='flex items-center gap-3 cursor-pointer'>
+              <div>·</div>
+              <span className='sm:hidden'>Privacy</span>
+              <span className='hidden sm:inline'>Privacy Policy</span>
             </div>
-            <div></div>
           </div>
-          <div className='flex justify-baseline items-baseline gap-12'>
+          <div className='flex justify-end items-center gap-3 sm:justify-between'>
             <div className='flex gap-6'>
               <div className='flex items-center gap-3 cursor-pointer'>
                 <GrLanguage />
-                Language
+                <span className='sm:hidden'>Lang</span>
+                <span className='hidden sm:inline'>Language</span>
               </div>
               <div className='flex items-center gap-3 cursor-pointer'>
                 <GrCurrency />
-                Currency
+                <span className='sm:hidden'>Curr</span>
+                <span className='hidden sm:inline'>Currency</span>
               </div>
             </div>
             <div className='flex items-center gap-3 cursor-pointer'>

@@ -28,7 +28,10 @@ const authenticateUser = async (req, res, next) => {
 const verifyEmail = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
-    if (user.isVerified) {
+    if (!user.isActive) {
+      res.status(404).json('This is an inactive account.');
+    }
+    if (user.isVerified & user.isActive) {
       next();
     } else {
       return res
@@ -41,5 +44,3 @@ const verifyEmail = async (req, res, next) => {
 };
 
 module.exports = { authenticateUser, verifyEmail };
-
-// module.exports = authenticateUser;

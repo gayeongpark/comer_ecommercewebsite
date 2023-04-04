@@ -93,21 +93,20 @@ router.put(
 //delete user
 router.delete('/delete/:id', authenticateUser, async (req, res, next) => {
   try {
+    // console.log('Starting delete request');
     const user = await User.findById(req.params.id);
-
+    // console.log(req.user.id);
     if (!user) {
       return res.status(404).json('User not found.');
     }
-
-    if (user !== req.user.id) {
-      return res
-        .status(403)
-        .json('You are not authorized to delete this user.');
-    }
-
-    await User.findByIdAndDelete(req.params.id);
-
-    res.status(200).json('User has been deleted.');
+    await User.findOneAndUpdate(
+      { _id: user._id },
+      { isActive: false },
+      { new: true }
+    );
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.status(200).json('We are deleting your account. please hold on...');
   } catch (error) {
     next(error);
   }
