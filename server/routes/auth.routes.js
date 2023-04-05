@@ -29,35 +29,27 @@ router.post('/signup', async (req, res, next) => {
       password2: hash2,
       emailToken: token,
       isVerified: false,
+      isActive: false,
     });
     await newUser.save();
 
     //I can revise that into comers' email acount like this below
     // let testAccount = await nodemailer.createTestAccount()
-    // const transporter = nodemailer.createTransport({
-    //   service: 'gmail',
-    //   // port: 587,
-    //   // secure: false,
-    //   auth: {
-    //     user: process.env.NODEMAILER_USER,
-    //     pass: process.env.NODEMAILER_PASS,
-    //   },
-    //   // tls: {
-    //   //   rejectUnauthorized: false,
-    //   // },
-    // });
-
     const transporter = nodemailer.createTransport({
-      host: '0.0.0.0',
-      port: 1025,
+      service: 'gmail',
+      auth: {
+        user: process.env.NODEMAILER_ID,
+        pass: process.env.NODEMAILER_PASS,
+      },
     });
+
     const url = `http://localhost:3000/emailVerification/${token}`;
     try {
       await transporter.sendMail({
-        from: `"Comer Team" <${process.env.NODEMAILER_USER}>`,
+        from: `"Comer Team" <${process.env.NODEMAILER_ID}>`,
         to: newUser.email,
         subject: 'Important: verify your email to use Comer',
-        html: `<h1>Hello user!</h1> <div>Comer received a request to create an account for you.</div> <div>Before we proceed, we need you to verify the email address you provided.</div> <div>Click <a href='${url}'>here</a> to verify your email.</div> <div></div> <div>Thank you,</div> <div>Comer</div>`,
+        html: `<h3>Hello user!</h3> <div>Comer received a request to create an account for you.</div> <div>Before we proceed, we need you to verify the email address you provided.</div> <div>Click <a href='${url}'>here</a> to verify your email.</div> <div> </div> <div>Thank you,</div> <div>Comer</div>`,
       });
     } catch (error) {
       await newUser.remove();
@@ -208,7 +200,11 @@ router.post('/forgotPassword', async (req, res, next) => {
     const user = await Reset.findOne({ email });
     if (user) {
       // Email already exists, delete the existing reset to allow for a new one
-      await user.deleteOne();
+      return res
+        .status(400)
+        .json(
+          'This email has already been reset, please check out your email!'
+        );
     } else {
       // Email doesn't exist, save the reset
       const newReset = new Reset({
@@ -219,17 +215,22 @@ router.post('/forgotPassword', async (req, res, next) => {
       // Send the password reset email
     }
     const transporter = nodemailer.createTransport({
-      host: '0.0.0.0',
-      port: 1025,
+      service: 'gmail',
+      auth: {
+        user: process.env.NODEMAILER_ID,
+        pass: process.env.NODEMAILER_PASS,
+      },
     });
     const url = `http://localhost:3000/resetPassword/${token}`;
     await transporter.sendMail({
-      from: 'comernoreply@comer.com',
+      from: `"Comer Team" <${process.env.NODEMAILER_ID}>`,
       to: email,
       subject: 'Ready to reset your password.',
       html: `Click <a href='${url}'>here</a> to reset your password`,
     });
-    res.status(200).json('Please check your email!');
+    res
+      .status(200)
+      .json('Please check your email! and then reset your password now!');
   } catch (error) {
     next(error);
   }

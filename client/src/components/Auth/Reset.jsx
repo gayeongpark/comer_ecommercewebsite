@@ -8,6 +8,8 @@ import axios from 'axios';
 
 export default function Reset() {
   const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const { token } = useParams();
@@ -22,11 +24,20 @@ export default function Reset() {
       password,
       password2,
     };
-    await axios.post('/auth/resetPassword', response, {
-      headers: { 'Content-Type': 'application/json' },
-      withCredentials: true,
-    });
-    navigate('/login');
+    try {
+      await axios.post('/auth/resetPassword', response, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      });
+      setSuccessMessage('Password reset successful, please hold on...');
+      setError('');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (error) {
+      setError(error.response.data);
+      setSuccessMessage('');
+    }
   };
   return (
     <div>
@@ -87,7 +98,7 @@ export default function Reset() {
                     className='block w-full rounded-md border-0 py-2 px-3.5 text-sm leading-6 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-700'
                     required
                   />
-                 <div className='text-2xl absolute top-2 right-5 text-gray-300'> 
+                  <div className='text-2xl absolute top-2 right-5 text-gray-300'>
                     {open === false ? (
                       <BiHide onClick={toggle} />
                     ) : (
@@ -96,6 +107,10 @@ export default function Reset() {
                   </div>
                 </div>
               </div>
+            </div>
+            <div className='text-red-600 mt-2'>{error && error}</div>
+            <div className='text-red-600 mt-2'>
+              {successMessage && successMessage}
             </div>
             <div className='mt-10'>
               <button

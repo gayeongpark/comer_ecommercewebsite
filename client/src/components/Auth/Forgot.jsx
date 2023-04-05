@@ -4,12 +4,13 @@ import axios from 'axios';
 
 export default function Forgot() {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
+      const response = await axios.post(
         '/auth/forgotPassword',
         { email },
         {
@@ -17,8 +18,11 @@ export default function Forgot() {
           withCredentials: true,
         }
       );
+      setSuccessMessage(response.data.message);
+      setError('');
     } catch (error) {
-      setError(error.response.data)
+      setError(error.response.data);
+      setSuccessMessage('');
     }
   };
   return (
@@ -64,9 +68,10 @@ export default function Forgot() {
               >
                 Submit
               </button>
-              <div>
-              {error && error}
-                </div>
+              <div className='text-red-600 mt-2'>{error && error}</div>
+              <div className='text-red-600 mt-2'>
+                {successMessage && successMessage}
+              </div>
             </div>
           </form>
         </div>
