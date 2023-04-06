@@ -29,7 +29,7 @@ export default function Reset() {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
-      setSuccessMessage('Password reset successful, please hold on...');
+      setSuccessMessage('The password has been successfully reset. Please hold on...');
       setError('');
       setTimeout(() => {
         navigate('/login');

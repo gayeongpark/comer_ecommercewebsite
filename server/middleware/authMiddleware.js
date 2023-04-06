@@ -12,11 +12,12 @@ const authenticateUser = async (req, res, next) => {
     if (!payload) {
       return res.status(406).json('Unauthorized!');
     }
-    const user = await User.findOne({ id: payload._id });
+    const user = await User.findById(payload.id);
     if (!user) {
       return res.status(406).json('Unauthorized!');
     }
     req.user = user;
+    // console.log(req.user)
     //By attaching the user object to the req object, the user object can be accessed in subsequent middleware functions or route handlers that use the same req object.
     //This means that the authenticated user's details can be easily accessed by any middleware functions or route handlers that follow the authentication middleware.
     next();

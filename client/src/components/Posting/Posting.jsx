@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { HiOutlinePhotograph } from 'react-icons/hi';
 import { DateRangePicker } from 'react-date-range';
 import { format } from 'date-fns';
+import axios from 'axios';
+import ReactMapGL, { Marker } from 'react-map-gl';
+import { GiPositionMarker } from 'react-icons/gi';
 
 export default function Posting() {
   const [openInputImage, setOpenInputImage] = useState(false);
@@ -20,6 +23,53 @@ export default function Posting() {
 
   const [title, setTitle] = useState();
 
+  const [viewport, setViewport] = useState({
+    longitude: -122.4,
+    latitude: 37.8,
+    zoom: 10,
+  });
+
+  const [location, setLocation] = useState({
+    country: '',
+    city: '',
+    street: '',
+    province: '',
+  });
+
+  const handleLocationChange = (e) => {
+    setLocation({
+      ...location,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSearch = async () => {
+    const { country, city, street } = location;
+    const address = `${street} ${city} ${country}`;
+
+    try {
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          address
+        )}.json?access_token=${process.env.REACT_APP_MAPBOXAPIKEY}`
+      );
+      const { features } = response.data;
+
+      if (features && features.length > 0) {
+        const { center } = features[0];
+        setViewport((prevState) => ({
+          ...prevState,
+          latitude: center[1],
+          longitude: center[0],
+        }));
+      } else {
+        console.log('No results found');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
@@ -30,6 +80,7 @@ export default function Posting() {
     setStartDate(ranges.selection.startDate);
     setEndDate(ranges.selection.endDate);
   };
+
   const selectionRange = {
     startDate: startDate,
     endDate: endDate,
@@ -80,7 +131,7 @@ export default function Posting() {
                 <div className='mt-4 flex text-sm leading-6 text-gray-600'>
                   <label
                     htmlFor='file-upload'
-                    className='relative cursor-pointer rounded-md bg-white font-semibold text-red-600 '
+                    className='relative cursor-pointer rounded-md bg-white font-semibold text-red-600'
                   >
                     <span onClick={() => setOpenInputImage(!openInputImage)}>
                       Upload files
@@ -149,7 +200,7 @@ export default function Posting() {
                   id='title'
                   autoComplete='off'
                   value={title}
-                  onChange={e => setTitle(e.target.value)}
+                  onChange={(e) => setTitle(e.target.value)}
                   className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -896,6 +947,8 @@ export default function Posting() {
                 <select
                   id='country'
                   name='country'
+                  value={location.country}
+                  onChange={handleLocationChange}
                   autoComplete='off'
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
@@ -916,6 +969,8 @@ export default function Posting() {
                   type='text'
                   name='city'
                   id='city'
+                  value={location.city}
+                  onChange={handleLocationChange}
                   autoComplete='off'
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
@@ -933,23 +988,8 @@ export default function Posting() {
                   type='text'
                   name='province'
                   id='province'
-                  autoComplete='off'
-                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
-                />
-              </div>
-            )}
-            {openInputAddress && (
-              <div className='col-span-6 sm:col-span-3'>
-                <label
-                  htmlFor='zip'
-                  className='block text-sm font-medium leading-6 text-gray-900'
-                >
-                  ZIP / Postal code
-                </label>
-                <input
-                  type='number'
-                  name='zip'
-                  id='zip'
+                  value={location.province}
+                  onChange={handleLocationChange}
                   autoComplete='off'
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
@@ -967,15 +1007,51 @@ export default function Posting() {
                   type='text'
                   name='street'
                   id='street'
+                  value={location.street}
+                  onChange={handleLocationChange}
                   autoComplete='off'
                   className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
             {openInputAddress && (
+              <div className='col-span-6 sm:col-span-3'>
+                <label
+                  htmlFor='map'
+                  className='block text-sm font-medium leading-6 text-gray-900'
+                >
+                  Map
+                </label>
+                <div
+                  className='overflow-hidden'
+                  style={{ height: '100vh', width: '100%' }}
+                >
+                  <ReactMapGL
+                    mapboxAccessToken={process.env.REACT_APP_MAPBOXAPIKEY}
+                    initialViewState={viewport}
+                    mapStyle='mapbox://styles/mapbox/streets-v9'
+                    transitionDuration='200'
+                    onViewportChange={(viewPort) => setViewport(viewPort)}
+                    dragPan={true}
+                  >
+                    <Marker
+                      longitude={viewport.longitude}
+                      latitude={viewport.latitude}
+                      offsetLeft={-3.5 * viewport.zoom}
+                      offsetTop={-7 * viewport.zoom}
+                      anchor='bottom'
+                    >
+                      <GiPositionMarker className='text-xl text-red-600' />
+                    </Marker>
+                  </ReactMapGL>
+                </div>
+              </div>
+            )}
+            {openInputAddress && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
+                  onClick={handleSearch}
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
                   Save

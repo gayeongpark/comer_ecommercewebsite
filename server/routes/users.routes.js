@@ -8,7 +8,8 @@ const router = express.Router();
 router.get('/:id', authenticateUser, async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) {
+    // console.log(user)
+    if (user.id !== req.user.id) {
       return res.status(404).json('User not found');
     }
     // console.log(user);
@@ -84,7 +85,7 @@ router.put(
       }
       res.status(200).json(updatedUser);
     } catch (error) {
-      console.log('Error:', error);
+      // console.log('Error:', error);
       next(error);
     }
   }
@@ -96,7 +97,7 @@ router.delete('/delete/:id', authenticateUser, async (req, res, next) => {
     // console.log('Starting delete request');
     const user = await User.findById(req.params.id);
     // console.log(req.user.id);
-    if (!user) {
+    if (user.id !== req.user.id) {
       return res.status(404).json('User not found.');
     }
     await User.findOneAndUpdate(

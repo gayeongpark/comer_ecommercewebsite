@@ -76,7 +76,7 @@ router.get('/verifyEmail/:token', async (req, res, next) => {
       { isVerified: true, isActive: true, emailToken: null },
       { new: true }
     );
-    console.log(user);
+    // console.log(user);
     if (user) {
       res.status(200).json('Your email is verified!');
     } else {
@@ -89,13 +89,14 @@ router.get('/verifyEmail/:token', async (req, res, next) => {
 
 router.post('/login', verifyEmail, async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password} = req.body;
     const user = await User.findOne({ email });
-    console.log(user);
+    // console.log(user);
     if (!user) {
       return res.status(404).json('This user was not registered!');
     }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    // const isPassword2Correct = await bcrypt.compare(password2, user.password2);
     if (!isPasswordCorrect) {
       return res
         .status(403)
@@ -252,11 +253,13 @@ router.post('/resetPassword', async (req, res, next) => {
     }
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
+    const hash2 = bcrypt.hashSync(req.body.password2, salt);
     // Update the user's password
     await User.updateOne(
       { _id: user._id },
       {
         password: hash,
+        password2: hash2,
       }
     );
     // Delete the reset token to prevent it from being used again

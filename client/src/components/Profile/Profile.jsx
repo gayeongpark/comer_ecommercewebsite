@@ -58,7 +58,9 @@ export default function Profile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userData = await axios.get(`/users/${id}`);
+        const userData = await axios.get(`/users/${id}`, {
+          withCredentials: true,
+        });
         setUserProfile(userData.data);
         setIsLoading(false);
       } catch (error) {
@@ -84,15 +86,7 @@ export default function Profile() {
       dispatch(setAuthUser(updatedUserData));
       setFormData((prevFormData) => ({
         ...prevFormData,
-        ...Object.keys(formData).reduce((acc, key) => {
-          if (formData[key] === prevFormData[key]) {
-            return acc;
-          }
-          return {
-            ...acc,
-            [key]: '',
-          };
-        }, {}),
+        formData,
       }));
     } catch (error) {
       console.error('Error updating user:', error);
@@ -488,9 +482,9 @@ export default function Profile() {
                 )}
               </div>
               <Link to={`/yourProfile/${authUser?.id}/delete`}>
-              <div className='flex px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6 cursor-pointer'>
-                Do you want to delete your account?
-              </div>
+                <div className='flex px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6 cursor-pointer'>
+                  Do you want to delete your account?
+                </div>
               </Link>
             </dl>
           </div>

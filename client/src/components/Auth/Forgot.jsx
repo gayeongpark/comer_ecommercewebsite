@@ -10,7 +10,7 @@ export default function Forgot() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
+      await axios.post(
         '/auth/forgotPassword',
         { email },
         {
@@ -18,7 +18,7 @@ export default function Forgot() {
           withCredentials: true,
         }
       );
-      setSuccessMessage(response.data.message);
+      setSuccessMessage('please check out your email inbox!');
       setError('');
     } catch (error) {
       setError(error.response.data);

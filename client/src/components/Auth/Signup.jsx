@@ -12,8 +12,8 @@ import { loginGoogle } from '../../api/firebase';
 
 export default function Signup() {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
-
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [userGoogle] = useAuthState(auth);
   const [open, setOpen] = useState(false);
   const toggle = () => {
@@ -40,6 +40,7 @@ export default function Signup() {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       });
+      setSuccessMessage('please check out yor email inbox to verify your email!');
       navigate('/login');
     } catch (error) {
       setError(error.response.data);
@@ -187,6 +188,9 @@ export default function Signup() {
               Continue
             </button>
             <div className='text-red-600 mt-2'>{error && error}</div>
+            <div className='text-red-600 mt-2'>
+              {successMessage && successMessage}
+            </div>
             <div className='mx-auto max-w-2xl text-center'>
               <p className='mt-8 text-md leading-8 text-gray-600'>
                 Alreay have an account?{' '}
