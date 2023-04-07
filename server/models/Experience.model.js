@@ -3,9 +3,8 @@ const { Schema, model } = require('mongoose');
 
 const experienceSchema = new Schema(
   {
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
+    userId: {
+      type: String,
       required: true,
     },
     title: {
@@ -44,8 +43,12 @@ const experienceSchema = new Schema(
       type: String,
       required: true,
     },
-    address: {
-      type: String,
+    longitude: {
+      type: Number,
+      required: true,
+    },
+    latitude: {
+      type: Number,
       required: true,
     },
     images: { type: [String], required: true },
@@ -73,6 +76,14 @@ const experienceSchema = new Schema(
     },
     tags: {
       type: [String],
+      required: true,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
       required: true,
     },
   },
