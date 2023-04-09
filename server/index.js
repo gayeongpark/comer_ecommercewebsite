@@ -46,8 +46,8 @@ app.use('/users', usersRoutes);
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 
-const productsRoutes = require('./routes/products.routes');
-app.use('/products', productsRoutes);
+const experiencesRoutes = require('./routes/experiences.routes');
+app.use('/experiences', experiencesRoutes);
 
 // app.use((err, req, res, next) => {
 //   const errorStatus = err.status || 500;

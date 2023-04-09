@@ -2,17 +2,21 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlinePhotograph } from 'react-icons/hi';
 import { DateRangePicker } from 'react-date-range';
+import { MdOutlineCancel } from 'react-icons/md';
 import { format } from 'date-fns';
-// import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import ReactMapGL, {
   GeolocateControl,
   Marker,
   NavigationControl,
 } from 'react-map-gl';
+// import { useSelector } from 'react-redux';
 import { GiPositionMarker } from 'react-icons/gi';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Posting() {
+  const { id } = useParams();
   const [openInputImage, setOpenInputImage] = useState(false);
   const [openInputTitle, setOpenInputTitle] = useState(false);
   const [openInputAddress, setOpenInputAddress] = useState(false);
@@ -26,7 +30,50 @@ export default function Posting() {
   const [openInputLanguage, setOpenInputLanguage] = useState(false);
   const [openInputTags, setOpenInputTags] = useState(false);
 
-  const [title, setTitle] = useState();
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [perks, setPerks] = useState({
+    food: '',
+    transportation: '',
+    beverage: '',
+    alcohol: '',
+    equipment: '',
+    others: '',
+  });
+  const [minimumAge, setMinimumAge] = useState('');
+  const [kidsAllowed, setKidsAllowed] = useState(false);
+  const [petsAllowed, setPetsAllowed] = useState(false);
+  const [maxGuest, setMaxGuest] = useState('');
+  const [language, setLanguage] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [price, setPrice] = useState('');
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
+  const [province, setProvince] = useState('');
+  const [street, setStreet] = useState('');
+  const [notice, setNotice] = useState('');
+  const [cancellation1, setCancellation1] = useState(false);
+  const [cancellation2, setCancellation2] = useState(false);
+
+  const handleFileChange = (event) => {
+    const files = event.target.files;
+    const urls = [];
+
+    for (let i = 0; i < files.length; i++) {
+      urls.push(URL.createObjectURL(files[i]));
+    }
+
+    setSelectedFiles(files);
+    setPreviewUrls(urls);
+  };
+
+  const handlePerksChange = (event) => {
+    const { name, value } = event.target;
+    setPerks({ ...perks, [name]: value });
+  };
 
   const [viewport, setViewport] = useState({
     longitude: -122.084801,
@@ -81,6 +128,7 @@ export default function Posting() {
           Be a host
         </h3>
       </div>
+
       {/* image */}
       <div className='w-2/3'>
         <dl>
@@ -89,36 +137,66 @@ export default function Posting() {
               Experience image
             </dt>
             <div className='flex mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10'>
-              <div className='text-center'>
-                <HiOutlinePhotograph
-                  className='mx-auto h-12 w-12 text-gray-300'
-                  aria-hidden='true'
-                />
-                <div className='mt-4 flex text-sm leading-6 text-gray-600'>
-                  <label
-                    htmlFor='file-upload'
-                    className='relative cursor-pointer rounded-md bg-white font-semibold text-red-600'
-                  >
-                    <span onClick={() => setOpenInputImage(!openInputImage)}>
-                      Upload files
-                    </span>
-                    <input
-                      id='file-upload'
-                      name='file-upload'
-                      type='file'
-                      className='sr-only'
-                    />
-                  </label>
-                  <p className='pl-1'>or drag and drop</p>
+              {previewUrls.length > 0 ? (
+                <div className='grid grid-cols-2 gap-3'>
+                  {previewUrls.map((url, index) => (
+                    <div key={index} className='relative'>
+                      <img
+                        src={url}
+                        alt={`Preview ${index}`}
+                        className='h-50 w-50 object-cover rounded-md'
+                      />
+                      <button
+                        onClick={() => {
+                          const newFiles = [...selectedFiles];
+                          newFiles.splice(index, 1);
+                          setSelectedFiles(newFiles);
+
+                          const newUrls = [...previewUrls];
+                          newUrls.splice(index, 1);
+                          setPreviewUrls(newUrls);
+                        }}
+                        className='m-2 absolute top-0 right-0 rounded-full bg-white p-1'
+                      >
+                        <MdOutlineCancel className='h-5 w-5 text-red-500' />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-                <p className='text-xs leading-5 text-gray-600'>
-                  PNG, JPG, GIF up to 10MB
-                </p>
-              </div>
+              ) : (
+                <div className='text-center'>
+                  <HiOutlinePhotograph
+                    className='mx-auto h-12 w-12 text-gray-300'
+                    aria-hidden='true'
+                  />
+                  <div className='mt-4 flex text-sm leading-6 text-gray-600'>
+                    <label
+                      htmlFor='file-upload'
+                      className='relative cursor-pointer rounded-md bg-white font-semibold text-red-600'
+                    >
+                      <span onClick={() => setOpenInputImage(!openInputImage)}>
+                        Upload files
+                      </span>
+                      <input
+                        id='file-upload'
+                        name='file-upload'
+                        type='file'
+                        className='sr-only'
+                        onChange={handleFileChange}
+                        multiple
+                      />
+                    </label>
+                    <p className='pl-1'>or drag and drop</p>
+                  </div>
+                  <p className='text-xs leading-5 text-gray-600'>
+                    PNG, JPG, GIF up to 10MB
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* <div className='font-medium text-red-600 cursor-pointer'>Edit</div> */}
-            {openInputImage && (
+            {/* {openInputImage && (
               <div className='flex items-center space-x-4 mt-3 mt-4'>
                 <button
                   type='submit'
@@ -134,7 +212,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Title */}
@@ -171,7 +249,7 @@ export default function Posting() {
                 />
               </div>
             )}
-            {openInputTitle && (
+            {/* {openInputTitle && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -187,7 +265,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* What you'll do */}
@@ -196,7 +274,9 @@ export default function Posting() {
               What you'll do
             </dt>
 
-            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'></dd>
+            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
+              {description}
+            </dd>
 
             <div
               onClick={() => setOpenInputIntro(!openInputIntro)}
@@ -220,11 +300,13 @@ export default function Posting() {
                   name='description'
                   id='description'
                   autoComplete='off'
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
-            {openInputIntro && (
+            {/* {openInputIntro && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -240,7 +322,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* What's includes */}
@@ -248,11 +330,22 @@ export default function Posting() {
             <dt className='text-sm font-medium text-gray-500'>
               What's includes
             </dt>
-
-            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              Korean food in K-town
-            </dd>
-
+            {perks && (
+              <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
+                {perks.food && `Food: ${perks.food}`}
+                <br />
+                {perks.transportation &&
+                  `Transportation: ${perks.transportation}`}
+                <br />
+                {perks.beverage && `Beverage: ${perks.beverage}`}
+                <br />
+                {perks.alcohol && `Alcohol: ${perks.alcohol}`}
+                <br />
+                {perks.equipment && `Equipment: ${perks.equipment}`}
+                <br />
+                {perks.others && `Others: ${perks.others}`}
+              </dd>
+            )}
             <div
               onClick={() => setOpenInputPerks(!openInputPerks)}
               className='font-medium text-red-600 cursor-pointer'
@@ -270,97 +363,111 @@ export default function Posting() {
                 <div className='text-gray-500'>
                   please add what you will offer to your guests
                 </div>
-                <select
-                  id='country'
-                  name='country'
-                  autoComplete='off'
-                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                <label
+                  htmlFor='food'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
-                  <option>Select what you'll offer</option>
-                  <option value='Food'>Food</option>
-                  <option value='Transporation'>Transporation</option>
-                  <option value='Beverage'>Beverage</option>
-                  <option value='Alchohol'>Alchohol</option>
-                  <option value='Equipment'>Equipment</option>
-                </select>
+                  Food
+                </label>
                 <div>
                   <textarea
                     type='text'
-                    name='description'
-                    id='description'
+                    id='food'
+                    name='food'
+                    value={perks.food}
+                    onChange={handlePerksChange}
                     autoComplete='off'
                     className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
-                <select
-                  id='country'
-                  name='country'
-                  autoComplete='off'
-                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                <label
+                  htmlFor='transportation'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
-                  <option>Select what you'll offer</option>
-                  <option value='Food'>Food</option>
-                  <option value='Transporation'>Transporation</option>
-                  <option value='Beverage'>Beverage</option>
-                  <option value='Alchohol'>Alchohol</option>
-                  <option value='Equipment'>Equipment</option>
-                </select>
+                  Transportation
+                </label>
                 <div>
                   <textarea
                     type='text'
-                    name='description'
-                    id='description'
+                    id='transportation'
+                    name='transportation'
+                    value={perks.transportation}
+                    onChange={handlePerksChange}
                     autoComplete='off'
                     className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
-                <select
-                  id='country'
-                  name='country'
-                  autoComplete='off'
-                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                <label
+                  htmlFor='beverage'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
-                  <option>Select what you'll offer</option>
-                  <option value='Food'>Food</option>
-                  <option value='Transporation'>Transporation</option>
-                  <option value='Beverage'>Beverage</option>
-                  <option value='Alchohol'>Alchohol</option>
-                  <option value='Equipment'>Equipment</option>
-                </select>
+                  Beverage
+                </label>
                 <div>
                   <textarea
                     type='text'
-                    name='description'
-                    id='description'
+                    id='beverage'
+                    name='beverage'
+                    value={perks.beverage}
+                    onChange={handlePerksChange}
                     autoComplete='off'
                     className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
-                <select
-                  id='country'
-                  name='country'
-                  autoComplete='off'
-                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                <label
+                  htmlFor='alcohol'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
-                  <option>Select what you'll offer</option>
-                  <option value='Food'>Food</option>
-                  <option value='Transporation'>Transporation</option>
-                  <option value='Beverage'>Beverage</option>
-                  <option value='Alchohol'>Alchohol</option>
-                  <option value='Equipment'>Equipment</option>
-                </select>
+                  Alcohol
+                </label>
                 <div>
                   <textarea
                     type='text'
-                    name='description'
-                    id='description'
+                    id='alcohol'
+                    name='alcohol'
+                    value={perks.alcohol}
+                    onChange={handlePerksChange}
+                    autoComplete='off'
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                  />
+                </div>
+                <label
+                  htmlFor='equipment'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                >
+                  Equipment
+                </label>
+                <div>
+                  <textarea
+                    type='text'
+                    id='equipment'
+                    name='equipment'
+                    value={perks.equipment}
+                    onChange={handlePerksChange}
+                    autoComplete='off'
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                  />
+                </div>
+                <label
+                  htmlFor='others'
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                >
+                  others
+                </label>
+                <div>
+                  <textarea
+                    type='text'
+                    id='others'
+                    name='others'
+                    value={perks.others}
+                    onChange={handlePerksChange}
                     autoComplete='off'
                     className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
               </div>
             )}
-            {openInputPerks && (
+            {/* {openInputPerks && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -376,7 +483,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* requirement of the guest */}
@@ -386,7 +493,13 @@ export default function Posting() {
             </dt>
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              Minimum age: 20 years-old, Maximum number of guest: 10
+              {minimumAge && `Minimum age: ${minimumAge} years-old`}
+              <br />
+              {kidsAllowed && 'Guest can bring kids under 4 years'}
+              <br />
+              {petsAllowed && 'Guest can bring their pets'}
+              <br />
+              {maxGuest && `Maximun group size: ${maxGuest} persons`}
             </dd>
 
             <div
@@ -408,9 +521,11 @@ export default function Posting() {
                   their legal guardian.
                 </div>
                 <select
-                  id='age'
-                  name='age'
+                  id='minimumAge'
+                  name='minimumAge'
                   autoComplete='off'
+                  value={minimumAge}
+                  onChange={(e) => setMinimumAge(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
                   <option>Select minimum age</option>
@@ -432,6 +547,9 @@ export default function Posting() {
                       id='kids'
                       name='kids'
                       type='radio'
+                      checked={kidsAllowed}
+                      onChange={() => setKidsAllowed(true)}
+                      onClick={() => setKidsAllowed(!kidsAllowed)}
                       className='h-4 w-4 border-gray-300 text-red-600 focus:ring-red-600'
                     />
                     <label
@@ -446,6 +564,9 @@ export default function Posting() {
                       id='pets'
                       name='pets'
                       type='radio'
+                      checked={petsAllowed}
+                      onChange={() => setPetsAllowed(true)}
+                      onClick={() => setPetsAllowed(!petsAllowed)}
                       className='h-4 w-4 border-gray-300 text-red-600 focus:ring-red-600'
                     />
                     <label
@@ -471,6 +592,7 @@ export default function Posting() {
                   id='size'
                   name='size'
                   autoComplete='off'
+                  onChange={(e) => setMaxGuest(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
                   <option>Select maximum size of group</option>
@@ -487,7 +609,7 @@ export default function Posting() {
                 </select>
               </div>
             )}
-            {openInputAge && (
+            {/* {openInputAge && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -503,17 +625,15 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Language */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Language</dt>
-
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              English
+              {language && language}
             </dd>
-
             <div
               onClick={() => setOpenInputLanguage(!openInputLanguage)}
               className='font-medium text-red-600 cursor-pointer'
@@ -535,6 +655,7 @@ export default function Posting() {
                   id='time'
                   name='time'
                   autoComplete='off'
+                  onChange={(e) => setLanguage(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
                   <option>Select language</option>
@@ -544,7 +665,7 @@ export default function Posting() {
                 </select>
               </div>
             )}
-            {openInputLanguage && (
+            {/* {openInputLanguage && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -560,8 +681,9 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
+
           {/* General availiability */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>
@@ -569,9 +691,11 @@ export default function Posting() {
             </dt>
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              Time: Date:{' '}
-              {`${format(startDate, 'MM/dd/yyyy')} to 
+              {(startDate || endDate) &&
+                `Date: ${format(startDate, 'MM/dd/yyyy')} to 
                     ${format(endDate, 'MM/dd/yyyy')}`}
+              <br />
+              {(startTime || endTime) && `Time: ${startTime} to ${endTime}`}
             </dd>
 
             <div
@@ -595,6 +719,7 @@ export default function Posting() {
                   id='time'
                   name='time'
                   autoComplete='off'
+                  onChange={(e) => setStartTime(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
                   <option>Select start time</option>
@@ -660,6 +785,7 @@ export default function Posting() {
                   id='time'
                   name='time'
                   autoComplete='off'
+                  onChange={(e) => setEndTime(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
                   <option>Select end time</option>
@@ -731,7 +857,7 @@ export default function Posting() {
                 </div>
               </div>
             )}
-            {openInputTime && (
+            {/* {openInputTime && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -747,7 +873,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
           {/* Tag */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
@@ -801,7 +927,7 @@ export default function Posting() {
                     className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                   />
                 </div>
-                <div className='flex items-center space-x-4 mt-4'>
+                {/* <div className='flex items-center space-x-4 mt-4'>
                   <button
                     type='submit'
                     className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
@@ -815,7 +941,7 @@ export default function Posting() {
                   >
                     Cancel
                   </button>
-                </div>
+                </div> */}
               </form>
             )}
           </div>
@@ -825,7 +951,7 @@ export default function Posting() {
             <dt className='text-sm font-medium text-gray-500'>Price</dt>
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              $500
+              {price && `$ ${price}`}
             </dd>
 
             <div
@@ -848,9 +974,10 @@ export default function Posting() {
                     <span className='text-gray-500 sm:text-sm'>$</span>
                   </div>
                   <input
-                    type='text'
+                    type='number'
                     name='price'
                     id='price'
+                    onChange={(e) => setPrice(e.target.value)}
                     className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                     placeholder='0.00'
                   />
@@ -863,13 +990,13 @@ export default function Posting() {
                       name='currency'
                       className='h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm'
                     >
-                      <option>USD</option>
+                      <option value='USD'>USD</option>
                     </select>
                   </div>
                 </div>
               </div>
             )}
-            {openInputPrice && (
+            {/* {openInputPrice && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -885,7 +1012,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Address */}
@@ -894,7 +1021,10 @@ export default function Posting() {
               Where you'll be
             </dt>
 
-            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'></dd>
+            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
+              {country && country} {city && city} {province && province}{' '}
+              {street && street}
+            </dd>
 
             <div
               onClick={() => setOpenInputAddress(!openInputAddress)}
@@ -914,6 +1044,7 @@ export default function Posting() {
                   id='country'
                   name='country'
                   autoComplete='off'
+                  onChange={(e) => setCountry(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
                   <option>Select country</option>
@@ -933,6 +1064,7 @@ export default function Posting() {
                   type='text'
                   name='city'
                   id='city'
+                  onChange={(e) => setCity(e.target.value)}
                   autoComplete='off'
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
@@ -951,6 +1083,7 @@ export default function Posting() {
                   name='province'
                   id='province'
                   autoComplete='off'
+                  onChange={(e) => setProvince(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -968,6 +1101,7 @@ export default function Posting() {
                   name='street'
                   id='street'
                   autoComplete='off'
+                  onChange={(e) => setStreet(e.target.value)}
                   className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -1007,7 +1141,7 @@ export default function Posting() {
                 </div>
               </div>
             )}
-            {openInputAddress && (
+            {/* {openInputAddress && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -1023,14 +1157,16 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Notice */}
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Notice</dt>
 
-            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'></dd>
+            <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
+              {notice && notice}
+            </dd>
 
             <div
               onClick={() => setOpenInputNotice(!openInputNotice)}
@@ -1054,11 +1190,12 @@ export default function Posting() {
                   name='description'
                   id='description'
                   autoComplete='off'
+                  onChange={(e) => setNotice(e.target.value)}
                   className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
-            {openInputNotice && (
+            {/* {openInputNotice && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -1074,7 +1211,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
           {/* Cancellation policy */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
@@ -1083,7 +1220,10 @@ export default function Posting() {
             </dt>
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              Cancellation policy
+              {cancellation1 &&
+                'Guests can cancel until 7 days before the Experience start time for a full refund, or within 24 hours of booking as long as the booking is made more than 48 hours before the start time.'}{' '}
+              {cancellation2 &&
+                'Guests can cancel until 24 hours before the Experience start time for a full refund.'}
             </dd>
 
             <div
@@ -1106,13 +1246,16 @@ export default function Posting() {
                 <div className='mt-6 space-y-6'>
                   <div className='flex items-center gap-x-3'>
                     <input
-                      id='cancel'
-                      name='cancel'
+                      id='cancel1'
+                      name='cancel1'
                       type='radio'
+                      checked={cancellation1}
+                      onChange={() => setCancellation1(true)}
+                      onClick={() => setCancellation1(!cancellation1)}
                       className='h-4 w-4 border-gray-300 text-red-600 focus:ring-red-600'
                     />
                     <label
-                      htmlFor='cancel'
+                      htmlFor='cancel1'
                       className='block text-sm font-medium leading-6 text-gray-900'
                     >
                       Guests can cancel until 7 days before the Experience start
@@ -1123,13 +1266,16 @@ export default function Posting() {
                   </div>
                   <div className='flex items-center gap-x-3'>
                     <input
-                      id='cancel'
-                      name='cancel'
+                      id='cancel2'
+                      name='cancel2'
                       type='radio'
+                      checked={cancellation2}
+                      onChange={() => setCancellation2(true)}
+                      onClick={() => setCancellation2(!cancellation2)}
                       className='h-4 w-4 border-gray-300 text-red-600 focus:ring-red-600'
                     />
                     <label
-                      htmlFor='cancel'
+                      htmlFor='cancel2'
                       className='block text-sm font-medium leading-6 text-gray-900'
                     >
                       Guests can cancel until 24 hours before the Experience
@@ -1139,7 +1285,7 @@ export default function Posting() {
                 </div>
               </div>
             )}
-            {openInputCancel && (
+            {/* {openInputCancel && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='submit'
@@ -1155,13 +1301,14 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </div>
         </dl>
       </div>
       <div className='flex items-center space-x-4 mt-4'>
         <button
           type='submit'
+          // onClick={handleSubmit}
           className='rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
         >
           Submit

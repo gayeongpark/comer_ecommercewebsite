@@ -2,6 +2,7 @@ const express = require('express');
 const Experience = require('../models/Experience.model');
 const User = require('../models/User.model.js');
 const { authenticateUser } = require('../middleware/authMiddleware.js');
+const multer = require('multer');
 const router = express.Router();
 
 //get a post
@@ -47,13 +48,52 @@ router.get('/timeline', async (req, res, next) => {
 });
 
 //create a new post
+
+//1. Defined a storage engine for Multer that specifies where uploaded files should be stored and what name they should be given.
+
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    // console.log('Destination:', file);
+    callback(null, 'public/profileImages/');
+  },
+  filename: (req, file, callback) => {
+    // console.log('Filename:', file);
+    callback(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+//2. Created a Multer middleware that uses the storage engine and specifies that only image files should be accepted:
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, callback) => {
+    // console.log(req)
+    // console.log('File filter:', file);
+    if (
+      file.mimetype === 'image/png' ||
+      file.mimetype === 'image/jpg' ||
+      file.mimetype === 'image/jpeg'
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Only image files are allowed!'));
+    }
+  },
+});
+
+//3. If files were uploaded, it will set the profilePicture field in the request body to the path of the uploaded file. The path of the uploaded file will be available in req.files.path.
 router.post(
   ':id/createExperience',
   authenticateUser,
+  upload.array('images', 5),
   async (req, res, next) => {
     try {
+      let imageUrls = [];
+      if (req.files && req.files.length > 0) {
+        imageUrls = req.files.map((file) => file.path.replace(/\\/g, '/'));
+      }
       const newExperience = new Experience({
         userId: req.user.id,
+        images: imageUrls,
         ...req.body,
       });
       const savedExperience = await newExperience.save();

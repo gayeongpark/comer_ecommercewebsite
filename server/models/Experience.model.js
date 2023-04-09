@@ -15,14 +15,6 @@ const experienceSchema = new Schema(
       type: String,
       required: true,
     },
-    // typeOfFood: {
-    //   type: String,
-    //   required: true,
-    // },
-    // foodActivity: {
-    //   type: String,
-    //   required: true,
-    // },
     description: {
       type: String,
       required: true,
@@ -31,13 +23,19 @@ const experienceSchema = new Schema(
       type: Number,
       required: true,
     },
+    minimumAge: {
+      type: Number,
+      required: true,
+    },
+    groupSize: {
+      type: Number,
+      required: true,
+    },
     country: {
       type: String,
-      required: true,
     },
     city: {
       type: String,
-      required: true,
     },
     criteriaOfGuest: {
       type: String,
@@ -45,24 +43,49 @@ const experienceSchema = new Schema(
     },
     longitude: {
       type: Number,
-      required: true,
     },
     latitude: {
       type: Number,
-      required: true,
     },
     images: { type: [String], required: true },
     likes: { type: [String], required: true },
-    perks: { type: [String], required: true },
+    perks: {
+      food: {
+        name: String,
+        description: String,
+      },
+      beverage: {
+        name: String,
+        description: String,
+      },
+      alcohol: {
+        name: String,
+        description: String,
+      },
+      equipment: {
+        name: String,
+        description: String,
+      },
+      others: {
+        name: String,
+        description: String,
+      },
+    },
     notice: {
       type: String,
       require: true,
     },
-    meetingTime: {
+    startTime: {
       type: Number,
       required: true,
     },
-    leavingTime: {
+    kidsAllowed: {
+      type: Boolean,
+    },
+    petsAllowed: {
+      type: Boolean,
+    },
+    endTime: {
       type: Number,
       required: true,
     },
@@ -85,6 +108,12 @@ const experienceSchema = new Schema(
     endDate: {
       type: Date,
       required: true,
+    },
+    calcellation1: {
+      type: Boolean,
+    },
+    calcellation2: {
+      type: Boolean,
     },
   },
   { timestamps: true }

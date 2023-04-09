@@ -57,7 +57,7 @@ router.put(
   '/update/:id',
   authenticateUser,
 
-  upload.single('profilePicture'), // Add this line to handle file uploads
+  upload.single('profilePicture'), // Can add this line to handle file uploads
   async (req, res, next) => {
     // console.log('PUT request received');
     // console.log('Request file:', req.file);

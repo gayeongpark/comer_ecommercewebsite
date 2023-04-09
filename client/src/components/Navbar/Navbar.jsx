@@ -55,7 +55,7 @@ export default function Navbar() {
                   </div>
                   <div className='hidden md:block'>
                     <div className='ml-4 flex items-center md:ml-6 space-x-4'>
-                      <Link to='./hostingExperience/:id'>
+                      <Link to={`./hostingExperience/${authUser.id}`}>
                         <button
                           type='button'
                           className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
