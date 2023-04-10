@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { HiOutlinePhotograph } from 'react-icons/hi';
 import { DateRangePicker } from 'react-date-range';
 import { MdOutlineCancel } from 'react-icons/md';
 import { format } from 'date-fns';
 import { useParams } from 'react-router-dom';
+import { AddressAutofill, AddressMinimap } from '@mapbox/search-js-react';
 import axios from 'axios';
-import ReactMapGL, {
-  GeolocateControl,
-  Marker,
-  NavigationControl,
-} from 'react-map-gl';
-// import { useSelector } from 'react-redux';
-import { GiPositionMarker } from 'react-icons/gi';
+// import ReactMapGL, {
+//   GeolocateControl,
+//   Marker,
+//   NavigationControl,
+// } from 'react-map-gl';
+// // import { useSelector } from 'react-redux';
+// import { GiPositionMarker } from 'react-icons/gi';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Posting() {
@@ -29,6 +30,16 @@ export default function Posting() {
   const [openInputPrice, setOpenInputPrice] = useState(false);
   const [openInputLanguage, setOpenInputLanguage] = useState(false);
   const [openInputTags, setOpenInputTags] = useState(false);
+
+  const [feature, setFeature] = useState();
+  const handleRetrieve = useCallback(
+    (res) => {
+      const feature = res.features[0];
+      setFeature(feature);
+      console.log(feature);
+    },
+    [setFeature]
+  );
 
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
@@ -53,7 +64,7 @@ export default function Posting() {
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [province, setProvince] = useState('');
-  const [street, setStreet] = useState('');
+  const [address, setAddress] = useState('');
   const [notice, setNotice] = useState('');
   const [cancellation1, setCancellation1] = useState(false);
   const [cancellation2, setCancellation2] = useState(false);
@@ -75,13 +86,11 @@ export default function Posting() {
     setPerks({ ...perks, [name]: value });
   };
 
-  const [viewport, setViewport] = useState({
-    longitude: -122.084801,
-    latitude: 37.422131,
-    zoom: 10,
-  });
-
-  // const [latLng, setLatLng] = useState({ lat: null, lng: null });
+  // const [viewport, setViewport] = useState({
+  //   longitude: -122.084801,
+  //   latitude: 37.422131,
+  //   zoom: 10,
+  // });
 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -1016,14 +1025,14 @@ export default function Posting() {
           </div>
 
           {/* Address */}
-          <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
+          <form className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>
               Where you'll be
             </dt>
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              {country && country} {city && city} {province && province}{' '}
-              {street && street}
+              {country && `${country},`} {city && `${city},`}{' '}
+              {province && `${province},`} {address && address}
             </dd>
 
             <div
@@ -1035,21 +1044,60 @@ export default function Posting() {
             {openInputAddress && (
               <div className='col-span-6 sm:col-span-3'>
                 <label
+                  htmlFor='address'
+                  className='block text-sm font-medium leading-6 text-gray-900'
+                >
+                  Street
+                </label>
+                <AddressAutofill
+                  accessToken={process.env.REACT_APP_MAPBOXAPIKEY}
+                  onRetrieve={handleRetrieve}
+                >
+                  <input
+                    type='text'
+                    name='address'
+                    id='address'
+                    autoComplete='address-line1'
+                    onChange={(e) => setAddress(e.target.value)}
+                    className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                  />
+                </AddressAutofill>
+              </div>
+            )}
+            {openInputAddress && (
+              <div className='col-span-6 sm:col-span-3'>
+                <label
                   htmlFor='country'
                   className='block text-sm font-medium leading-6 text-gray-900'
                 >
                   country
                 </label>
-                <select
+                <input
+                  type='text'
                   id='country'
                   name='country'
-                  autoComplete='off'
+                  autoComplete='country-name'
                   onChange={(e) => setCountry(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                ></input>
+              </div>
+            )}
+            {openInputAddress && (
+              <div className='col-span-6 sm:col-span-3'>
+                <label
+                  htmlFor='state'
+                  className='block text-sm font-medium leading-6 text-gray-900'
                 >
-                  <option>Select country</option>
-                  <option value='United State'>United State</option>
-                </select>
+                  State / Province
+                </label>
+                <input
+                  type='text'
+                  name='state'
+                  id='state'
+                  autoComplete='address-level1'
+                  onChange={(e) => setProvince(e.target.value)}
+                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                />
               </div>
             )}
             {openInputAddress && (
@@ -1065,48 +1113,13 @@ export default function Posting() {
                   name='city'
                   id='city'
                   onChange={(e) => setCity(e.target.value)}
-                  autoComplete='off'
+                  autoComplete='address-level2'
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
             )}
-            {openInputAddress && (
-              <div className='col-span-6 sm:col-span-3'>
-                <label
-                  htmlFor='region'
-                  className='block text-sm font-medium leading-6 text-gray-900'
-                >
-                  State / Province
-                </label>
-                <input
-                  type='text'
-                  name='province'
-                  id='province'
-                  autoComplete='off'
-                  onChange={(e) => setProvince(e.target.value)}
-                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
-                />
-              </div>
-            )}
-            {openInputAddress && (
-              <div className='col-span-6 sm:col-span-3'>
-                <label
-                  htmlFor='street'
-                  className='block text-sm font-medium leading-6 text-gray-900'
-                >
-                  Street address
-                </label>
-                <input
-                  type='text'
-                  name='street'
-                  id='street'
-                  autoComplete='off'
-                  onChange={(e) => setStreet(e.target.value)}
-                  className='mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
-                />
-              </div>
-            )}
-            {openInputAddress && (
+
+            {feature && (
               <div className='col-span-6 sm:col-span-3'>
                 <label
                   htmlFor='map'
@@ -1115,39 +1128,33 @@ export default function Posting() {
                   Map
                 </label>
                 <div
+                  id='minimap-container'
                   className='overflow-hidden'
-                  style={{ height: '70vh', width: '100%' }}
+                  style={{
+                    height: '70vh',
+                    width: '100%',
+                  }}
                 >
-                  <ReactMapGL
-                    mapboxAccessToken={process.env.REACT_APP_MAPBOXAPIKEY}
-                    initialViewState={{
-                      ...viewport,
+                  <AddressMinimap
+                    accessToken={process.env.REACT_APP_MAPBOXAPIKEY}
+                    feature={feature}
+                    show={true}
+                    satelliteToggle={true}
+                    canAdjustMarker={true}
+                    onSaveMarkerLocation={(coord) => {
+                      console.log(coord);
                     }}
-                    mapStyle='mapbox://styles/mapbox/streets-v11'
-                    onViewportChange={(viewport) => {
-                      setViewport(viewport);
-                    }}
-                  >
-                    <Marker
-                      longitude={viewport.longitude}
-                      latitude={viewport.latitude}
-                      draggable
-                    >
-                      <GiPositionMarker className='text-3xl text-red-600' />
-                    </Marker>
-                    <NavigationControl position='bottom-right' />
-                    <GeolocateControl position='top-left' trackUserLocation />
-                  </ReactMapGL>
+                  />
                 </div>
               </div>
             )}
-            {/* {openInputAddress && (
+            {openInputAddress && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
-                  type='submit'
+                  type='button'
                   className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                 >
-                  Save
+                  Search
                 </button>
                 <button
                   type='button'
@@ -1157,8 +1164,8 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )} */}
-          </div>
+            )}
+          </form>
 
           {/* Notice */}
           <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
