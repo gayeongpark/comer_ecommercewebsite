@@ -12,7 +12,7 @@ const experienceSchema = new Schema(
       required: true,
     },
     language: {
-      type: String,
+      type: [String],
       required: true,
     },
     description: {

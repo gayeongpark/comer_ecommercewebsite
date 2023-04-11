@@ -4,20 +4,15 @@ import { HiOutlinePhotograph } from 'react-icons/hi';
 import { DateRangePicker } from 'react-date-range';
 import { MdOutlineCancel } from 'react-icons/md';
 import { format } from 'date-fns';
-import { useParams } from 'react-router-dom';
 import { AddressAutofill, AddressMinimap } from '@mapbox/search-js-react';
-import axios from 'axios';
-// import ReactMapGL, {
-//   GeolocateControl,
-//   Marker,
-//   NavigationControl,
-// } from 'react-map-gl';
-// // import { useSelector } from 'react-redux';
-// import { GiPositionMarker } from 'react-icons/gi';
+// import axios from 'axios';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+const animatedComponents = makeAnimated();
+
 export default function Posting() {
-  const { id } = useParams();
   const [openInputImage, setOpenInputImage] = useState(false);
   const [openInputTitle, setOpenInputTitle] = useState(false);
   const [openInputAddress, setOpenInputAddress] = useState(false);
@@ -30,6 +25,27 @@ export default function Posting() {
   const [openInputPrice, setOpenInputPrice] = useState(false);
   const [openInputLanguage, setOpenInputLanguage] = useState(false);
   const [openInputTags, setOpenInputTags] = useState(false);
+
+  const optionsLanguage = [
+    { value: 'english', label: 'English' },
+    { value: 'korean', label: 'Korean' },
+    { value: 'spanish', label: 'Spanish' },
+  ];
+
+  const handleSelectChange = (selectedOption) => {
+    console.log('selected:', selectedOption);
+  };
+
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      border: state.isFocused ? '1px solid #b91c1c' : provided.border,
+      boxShadow: state.isFocused ? '0 0 0 1px #b91c1c' : provided.boxShadow,
+      '&:hover': {
+        border: state.isFocused ? '1px solid #b91c1c' : provided.border,
+      },
+    }),
+  };
 
   const [feature, setFeature] = useState();
   const handleRetrieve = useCallback(
@@ -53,17 +69,18 @@ export default function Posting() {
     equipment: '',
     others: '',
   });
-  const [minimumAge, setMinimumAge] = useState('');
+
+  const [minimumAge, setMinimumAge] = useState(null);
   const [kidsAllowed, setKidsAllowed] = useState(false);
   const [petsAllowed, setPetsAllowed] = useState(false);
   const [maxGuest, setMaxGuest] = useState('');
-  const [language, setLanguage] = useState('');
+  // const [language, setLanguage] = useState(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [price, setPrice] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
-  const [province, setProvince] = useState('');
+  const [state, setState] = useState('');
   const [address, setAddress] = useState('');
   const [notice, setNotice] = useState('');
   const [cancellation1, setCancellation1] = useState(false);
@@ -461,7 +478,7 @@ export default function Posting() {
                   htmlFor='others'
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 >
-                  others
+                  Others
                 </label>
                 <div>
                   <textarea
@@ -641,7 +658,7 @@ export default function Posting() {
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Language</dt>
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              {language && language}
+              {/* {language && language} */}
             </dd>
             <div
               onClick={() => setOpenInputLanguage(!openInputLanguage)}
@@ -652,26 +669,24 @@ export default function Posting() {
             {openInputLanguage && (
               <div className='col-span-6 sm:col-span-3'>
                 <label
-                  htmlFor='age'
+                  htmlFor='language'
                   className='block text-sm font-medium leading-6 text-gray-900'
                 >
                   Language
                 </label>
                 <div className='text-gray-500'>
-                  please set language that you can speak for guests.
+                  please set languages that you can speak for guests.
                 </div>
-                <select
-                  id='time'
-                  name='time'
-                  autoComplete='off'
-                  onChange={(e) => setLanguage(e.target.value)}
-                  className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
-                >
-                  <option>Select language</option>
-                  <option value='English'>English</option>
-                  <option value='Korean'>Korean</option>
-                  <option value='Español'>Español</option>
-                </select>
+                <Select
+                  styles={customStyles}
+                  isMulti
+                  options={optionsLanguage}
+                  components={animatedComponents}
+                  id='language'
+                  name='language'
+                  onChange={handleSelectChange}
+                  className='mt-2 block w-1/2 rounded-md text-gray-900 shadow-sm ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                ></Select>
               </div>
             )}
             {/* {openInputLanguage && (
@@ -1032,7 +1047,7 @@ export default function Posting() {
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
               {country && `${country},`} {city && `${city},`}{' '}
-              {province && `${province},`} {address && address}
+              {state && `${state},`} {address && address}
             </dd>
 
             <div
@@ -1095,7 +1110,7 @@ export default function Posting() {
                   name='state'
                   id='state'
                   autoComplete='address-level1'
-                  onChange={(e) => setProvince(e.target.value)}
+                  onChange={(e) => setState(e.target.value)}
                   className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 />
               </div>
@@ -1118,8 +1133,7 @@ export default function Posting() {
                 />
               </div>
             )}
-
-            {feature && (
+            {feature && openInputAddress && (
               <div className='col-span-6 sm:col-span-3'>
                 <label
                   htmlFor='map'

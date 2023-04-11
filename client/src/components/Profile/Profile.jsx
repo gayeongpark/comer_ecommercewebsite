@@ -116,7 +116,7 @@ export default function Profile() {
                   Profile image
                 </dt>
                 <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-                  <span className='inline-block h-36 w-36 mb-2 overflow-hidden rounded-full'>
+                  <span className='inline-block justify-center h-36 w-36 mb-2 overflow-hidden rounded-full'>
                     <img
                       alt='Update profileImage'
                       className='flex h-full w-full text-gray-300'
@@ -128,32 +128,48 @@ export default function Profile() {
                     ></img>
                   </span>
                 </dd>
-                <input
-                  type='file'
-                  name='profilePicture'
-                  accept='/image/*'
-                  onChange={handleProfileImageChange}
-                  onClick={() => setOpenInputImage(!openInputImage)}
-                />
+                <dd className='mt-1 text-gray-900 sm:col-span-2 sm:mt-0'>
+                  <label htmlFor='profilePicture'>
+                    <span
+                      className='font-medium text-red-600 cursor-pointer'
+                      onClick={() => setOpenInputImage(!openInputImage)}
+                    >
+                      Upload image
+                    </span>
+                    <input
+                      id='profilePicture'
+                      type='file'
+                      name='profilePicture'
+                      accept='/image/*'
+                      onChange={handleProfileImageChange}
+                      className='sr-only'
+                    />
+                  </label>
+                </dd>
                 {/* <div className='font-medium text-red-600 cursor-pointer'>Edit</div> */}
 
                 {openInputImage && (
-                  <div className='flex items-center space-x-4 mt-3 mt-4'>
-                    <button
-                      type='submit'
-                      onClick={handleUpdateUser}
-                      className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                    >
-                      Save
-                    </button>
-                    <button
-                      type='button'
-                      onClick={() => setOpenInputImage(false)}
-                      className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                  <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
+                    <div className='flex items-center space-x-4 mt-3'>
+                      <button
+                        onClick={handleUpdateUser}
+                        type='submit'
+                        className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                      >
+                        Save
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => setOpenInputImage(false)}
+                        className='inline-flex items-center px-6 py-2 text-md font-medium text-gray-900 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2'
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <div
+                    className='font-xs text-red-600 mt-2'
+                    >please press save button</div>
+                  </dd>
                 )}
               </div>
               <div className='border-b px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>

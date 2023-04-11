@@ -56,7 +56,6 @@ const upload = multer({
 router.put(
   '/update/:id',
   authenticateUser,
-
   upload.single('profilePicture'), // Can add this line to handle file uploads
   async (req, res, next) => {
     // console.log('PUT request received');
@@ -70,7 +69,7 @@ router.put(
 
       let imageUrl = req.file?.path?.replace(/\\/g, '/');
       const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
+        req.user.id,
         {
           $set: {
             ...req.body,
