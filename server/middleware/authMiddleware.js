@@ -14,7 +14,7 @@ const authenticateUser = async (req, res, next) => {
     }
     const user = await User.findById(payload.id);
     if (!user) {
-      return res.status(406).json('Unauthorized!');
+      return res.status(407).json('Unauthorized!');
     }
     req.user = user;
     // console.log(req.user)

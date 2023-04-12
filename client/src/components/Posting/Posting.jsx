@@ -5,7 +5,7 @@ import { DateRangePicker } from 'react-date-range';
 import { MdOutlineCancel } from 'react-icons/md';
 import { format } from 'date-fns';
 import { AddressAutofill, AddressMinimap } from '@mapbox/search-js-react';
-// import axios from 'axios';
+import axios from 'axios';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -13,6 +13,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 const animatedComponents = makeAnimated();
 
 export default function Posting() {
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [openInputImage, setOpenInputImage] = useState(false);
   const [openInputTitle, setOpenInputTitle] = useState(false);
   const [openInputAddress, setOpenInputAddress] = useState(false);
@@ -31,10 +33,6 @@ export default function Posting() {
     { value: 'korean', label: 'Korean' },
     { value: 'spanish', label: 'Spanish' },
   ];
-
-  const handleSelectChange = (selectedOption) => {
-    console.log('selected:', selectedOption);
-  };
 
   const customStyles = {
     control: (provided, state) => ({
@@ -70,14 +68,15 @@ export default function Posting() {
     others: '',
   });
 
-  const [minimumAge, setMinimumAge] = useState(null);
+  const [minimumAge, setMinimumAge] = useState('');
   const [kidsAllowed, setKidsAllowed] = useState(false);
   const [petsAllowed, setPetsAllowed] = useState(false);
   const [maxGuest, setMaxGuest] = useState('');
-  // const [language, setLanguage] = useState(null);
+  const [language, setLanguage] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [price, setPrice] = useState('');
+  const [currency, setCurrency] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -102,12 +101,6 @@ export default function Posting() {
     const { name, value } = event.target;
     setPerks({ ...perks, [name]: value });
   };
-
-  // const [viewport, setViewport] = useState({
-  //   longitude: -122.084801,
-  //   latitude: 37.422131,
-  //   zoom: 10,
-  // });
 
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -144,6 +137,62 @@ export default function Posting() {
     setTags(tags.filter((_, i) => i !== index));
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData();
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append('files', selectedFiles[i]);
+    }
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('perks.food', perks.food);
+    formData.append('perks.beverage', perks.beverage);
+    formData.append('perks.alcohol', perks.alcohol);
+    formData.append('perks.equipment', perks.equipment);
+    formData.append('perks.others', perks.others);
+    formData.append('minimumAge', Number(minimumAge));
+    formData.append('kidsAllowed', kidsAllowed);
+    formData.append('petsAllowed', petsAllowed);
+    formData.append('maxGuest', Number(maxGuest));
+    formData.append('language', JSON.stringify(language));
+    formData.append('startTime', startTime);
+    formData.append('endTime', endTime);
+    formData.append('startDate', startDate);
+    formData.append('endDate', endDate);
+    formData.append('tags', JSON.stringify(tags));
+    formData.append('price', Number(price));
+    formData.append('currency', currency);
+    formData.append('country', country);
+    formData.append('city', city);
+    formData.append('state', state);
+    formData.append('address', address);
+    formData.append('latitude', feature?.geometry?.coordinates[1]);
+    formData.append('longitude', feature?.geometry?.coordinates[0]);
+    formData.append('coordinates', feature?.geometry?.coordinates);
+    formData.append('fullAddress', feature?.properties?.full_address);
+    formData.append('notice', notice);
+    formData.append('cancellation1', cancellation1);
+    formData.append('cancellation2', cancellation2);
+
+    try {
+      const response = await axios.post(
+        '/experiences/createExperience',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true,
+        }
+      );
+      console.log(response?.data);
+      setSuccess(alert('You have successfully posted an experience!'));
+    } catch (error) {
+      console.error(error.response.data);
+      setError(error.response.data);
+    }
+  };
+
   return (
     <div className='mx-auto mb-20 max-w-7xl px-4 sm:px-6 lg:px-8 overflow-hidden bg-white py-5 sm:rounded-lg'>
       <div className='px-4 py-6'>
@@ -154,6 +203,7 @@ export default function Posting() {
           Be a host
         </h3>
       </div>
+      <div>{error && error}</div>
 
       {/* image */}
       <div className='w-2/3'>
@@ -381,7 +431,7 @@ export default function Posting() {
             {openInputPerks && (
               <div className='col-span-6 sm:col-span-3'>
                 <label
-                  htmlFor='country'
+                  htmlFor='perks'
                   className='block text-sm font-medium leading-6 text-gray-900'
                 >
                   Type of perks
@@ -658,7 +708,12 @@ export default function Posting() {
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Language</dt>
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              {/* {language && language} */}
+              {language &&
+                language.map((option) => (
+                  <span key={option.value} className='mr-2'>
+                    {option.label}
+                  </span>
+                ))}
             </dd>
             <div
               onClick={() => setOpenInputLanguage(!openInputLanguage)}
@@ -684,7 +739,7 @@ export default function Posting() {
                   components={animatedComponents}
                   id='language'
                   name='language'
-                  onChange={handleSelectChange}
+                  onChange={setLanguage}
                   className='mt-2 block w-1/2 rounded-md text-gray-900 shadow-sm ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                 ></Select>
               </div>
@@ -899,6 +954,7 @@ export default function Posting() {
               </div>
             )} */}
           </div>
+
           {/* Tag */}
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Tags</dt>
@@ -906,7 +962,7 @@ export default function Posting() {
               {tags.map((tag, index) => (
                 <div
                   key={index}
-                  className='inline-flex items-center justify-center py-1 px-2 bg-gray border rounded-full'
+                  className='inline-flex items-center justify-center py-1 px-2 bg-gray border rounded-full mr-2'
                 >
                   <span className='mr-2'>{tag}</span>
                   <span
@@ -975,7 +1031,7 @@ export default function Posting() {
             <dt className='text-sm font-medium text-gray-500'>Price</dt>
 
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              {price && `$ ${price}`}
+              {price && `${currency} ${price}`}
             </dd>
 
             <div
@@ -995,7 +1051,15 @@ export default function Posting() {
                 <div className='text-gray-500'>please set the price</div>
                 <div className='relative mt-2 rounded-md shadow-sm'>
                   <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
-                    <span className='text-gray-500 sm:text-sm'>$</span>
+                    {currency === '$' && (
+                      <span className='text-gray-500 sm:text-sm'>$</span>
+                    )}
+                    {currency === '€' && (
+                      <span className='text-gray-500 sm:text-sm'>€</span>
+                    )}
+                    {currency === '₩' && (
+                      <span className='text-gray-500 sm:text-sm'>₩</span>
+                    )}
                   </div>
                   <input
                     type='number'
@@ -1012,9 +1076,13 @@ export default function Posting() {
                     <select
                       id='currency'
                       name='currency'
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
                       className='h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm'
                     >
-                      <option value='USD'>USD</option>
+                      <option value='$'>USD</option>
+                      <option value='€'>EUR</option>
+                      <option value='₩'>KRW</option>
                     </select>
                   </div>
                 </div>
@@ -1162,7 +1230,7 @@ export default function Posting() {
                 </div>
               </div>
             )}
-            {openInputAddress && (
+            {/* {openInputAddress && (
               <div className='flex items-center space-x-4 mt-4'>
                 <button
                   type='button'
@@ -1178,7 +1246,7 @@ export default function Posting() {
                   Cancel
                 </button>
               </div>
-            )}
+            )} */}
           </form>
 
           {/* Notice */}
@@ -1329,7 +1397,7 @@ export default function Posting() {
       <div className='flex items-center space-x-4 mt-4'>
         <button
           type='submit'
-          // onClick={handleSubmit}
+          onClick={handleSubmit}
           className='rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
         >
           Submit

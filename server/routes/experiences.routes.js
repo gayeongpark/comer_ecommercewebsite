@@ -1,4 +1,5 @@
 const express = require('express');
+const moment = require('moment');
 const Experience = require('../models/Experience.model');
 const User = require('../models/User.model.js');
 const { authenticateUser } = require('../middleware/authMiddleware.js');
@@ -54,7 +55,7 @@ router.get('/timeline', async (req, res, next) => {
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
     // console.log('Destination:', file);
-    callback(null, 'public/profileImages/');
+    callback(null, 'public/experienceImages/');
   },
   filename: (req, file, callback) => {
     // console.log('Filename:', file);
@@ -82,18 +83,38 @@ const upload = multer({
 
 //3. If files were uploaded, it will set the profilePicture field in the request body to the path of the uploaded file. The path of the uploaded file will be available in req.files.path.
 router.post(
-  ':id/createExperience',
+  '/createExperience',
   authenticateUser,
-  upload.array('images', 5),
+  upload.array('files', 5),
   async (req, res, next) => {
     try {
       let imageUrls = [];
       if (req.files && req.files.length > 0) {
         imageUrls = req.files.map((file) => file.path.replace(/\\/g, '/'));
       }
+      const { startTime, endTime } = req.body;
+
+      // console.log('start time:', startTime);
+      // console.log('end time:', endTime);
+
+      const startMoment = moment(startTime, 'h:mm A');
+      const endMoment = moment(endTime, 'h:mm A');
+
+      // console.log('start moment:', startMoment.format());
+      // console.log('end moment:', endMoment.format());
+
+      const duration = moment.duration(endMoment.diff(startMoment));
+
+      // console.log('duration:', duration.asMinutes());
+
+      const runningTime = duration.asMinutes();
+
+      // console.log('running time:', runningTime);
+
       const newExperience = new Experience({
         userId: req.user.id,
-        images: imageUrls,
+        files: imageUrls,
+        runningTime: runningTime,
         ...req.body,
       });
       const savedExperience = await newExperience.save();

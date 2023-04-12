@@ -5,70 +5,87 @@ const experienceSchema = new Schema(
   {
     userId: {
       type: String,
-      required: true,
     },
     title: {
       type: String,
-      required: true,
+      require: true,
     },
     language: {
       type: [String],
-      required: true,
+      set: function (language) {
+        // Parse the stringified array and return it
+        return JSON.parse(language).map((lang) => lang.value);
+      },
     },
     description: {
       type: String,
-      required: true,
+      require: true,
     },
     runningTime: {
       type: Number,
-      required: true,
     },
     minimumAge: {
       type: Number,
-      required: true,
-    },
-    groupSize: {
-      type: Number,
-      required: true,
+      require: true,
     },
     country: {
       type: String,
+      require: true,
     },
     city: {
       type: String,
+      require: true,
+    },
+    state: {
+      type: String,
+      require: true,
+    },
+    address: {
+      type: String,
+      require: true,
     },
     criteriaOfGuest: {
       type: String,
-      required: true,
+      require: true,
     },
     longitude: {
       type: Number,
+      require: true,
     },
     latitude: {
       type: Number,
+      require: true,
     },
-    images: { type: [String], required: true },
-    likes: { type: [String], required: true },
+    coordinates: {
+      type: [String],
+      require: true,
+    },
+    fullAddress: {
+      type: String,
+      require: true,
+    },
+    files: { type: [String], require: true },
+    likes: { type: [String] },
     perks: {
       food: {
-        name: String,
-        description: String,
+        type: String,
+        require: true,
       },
       beverage: {
-        name: String,
-        description: String,
+        type: String,
+        require: true,
       },
       alcohol: {
-        name: String,
-        description: String,
+        type: String,
+        require: true,
       },
       equipment: {
-        name: String,
-        description: String,
+        type: String,
+        require: true,
       },
       others: {
-        name: String,
-        description: String,
+        type: String,
+        require: true,
       },
     },
     notice: {
@@ -76,44 +93,56 @@ const experienceSchema = new Schema(
       require: true,
     },
     startTime: {
-      type: Number,
-      required: true,
+      type: String,
+      require: true,
     },
     kidsAllowed: {
       type: Boolean,
+      require: true,
     },
     petsAllowed: {
       type: Boolean,
+      require: true,
     },
     endTime: {
-      type: Number,
-      required: true,
+      type: String,
+      require: true,
     },
     maxGuest: {
       type: Number,
-      required: true,
+      require: true,
     },
     price: {
       type: Number,
-      required: true,
+      require: true,
+    },
+    currency: {
+      type: String,
+      require: true,
     },
     tags: {
       type: [String],
-      required: true,
+      require: true,
+      set: function (tags) {
+        // Parse the stringified array and return it
+        return JSON.parse(tags);
+      },
     },
     startDate: {
       type: Date,
-      required: true,
+      require: true,
     },
     endDate: {
       type: Date,
-      required: true,
+      require: true,
     },
-    calcellation1: {
+    cancellation1: {
       type: Boolean,
+      require: true,
     },
-    calcellation2: {
+    cancellation2: {
       type: Boolean,
+      require: true,
     },
   },
   { timestamps: true }
