@@ -38,11 +38,11 @@ router.get('/profile/:id', async (req, res, next) => {
   }
 });
 
-//get all post
-router.get('/timeline', async (req, res, next) => {
+//get random post
+router.get('/', async (req, res, next) => {
   try {
-    const posts = await Experience.find().sort({ createdAt: -1 });
-    res.status(200).json(posts);
+    const experiences = await Experience.aggregate([{ $sample: { size: 20 } }]);
+    res.status(200).json(experiences);
   } catch (error) {
     next(error);
   }

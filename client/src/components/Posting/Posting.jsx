@@ -186,7 +186,36 @@ export default function Posting() {
         }
       );
       console.log(response?.data);
-      setSuccess(alert('You have successfully posted an experience!'));
+      setSuccess('You have successfully posted an experience!');
+      setTitle('');
+      setDescription('');
+      setPerks({
+        food: '',
+        beverage: '',
+        alcohol: '',
+        equipment: '',
+        others: '',
+      });
+      setMinimumAge('');
+      setKidsAllowed(false);
+      setPetsAllowed(false);
+      setMaxGuest('');
+      setLanguage([]);
+      setStartTime('');
+      setEndTime('');
+      setStartDate('');
+      setEndDate('');
+      setTags([]);
+      setPrice('');
+      setCurrency('');
+      setCountry('');
+      setCity('');
+      setState('');
+      setAddress('');
+      setFeature(null);
+      setNotice('');
+      setCancellation1(false);
+      setCancellation2(false);
     } catch (error) {
       console.error(error.response.data);
       setError(error.response.data);
@@ -203,12 +232,13 @@ export default function Posting() {
           Be a host
         </h3>
       </div>
-      <div>{error && error}</div>
 
       {/* image */}
       <div className='w-2/3'>
         <dl>
           <div className='border-b py-5 sm:grid-cols-3 sm:gap-4 sm:px-6'>
+            {success && <div className='mb-5 text-red-600'>{success}</div>}
+            {error && <div className='mb-5 text-red-600'>{error}</div>}
             <dt className='text-sm font-medium text-gray-500'>
               Experience image
             </dt>
@@ -1402,6 +1432,8 @@ export default function Posting() {
         >
           Submit
         </button>
+        {success && <div className='text-red-600'>{success}</div>}
+        {error && <div className='text-red-600'>{error}</div>}
       </div>
     </div>
   );
