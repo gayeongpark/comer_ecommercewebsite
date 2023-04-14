@@ -14,7 +14,12 @@ router.get('/:id', async (req, res, next) => {
     if (!experience) {
       return res.status(404).json('Experience not found');
     }
-    res.status(200).json(experience);
+    const userId = experience.userId;
+    const owner = await User.findById(userId);
+    if (!owner) {
+      return res.status(404).json('User not found');
+    }
+    res.status(200).json({ experience, owner });
   } catch (error) {
     next(error);
   }

@@ -25,7 +25,7 @@ export default function App() {
       <Route path='/emailVerification/:token' element={<VertifiecEmail />} />
       <Route path='/yourProfile/:id/delete' element={<DeleteUser />} />
       <Route path='/hostingExperience' element={<Hosting />} />
-      <Route path='/product' element={<Product />} />
+      <Route path='/product/:id' element={<Product />} />
       <Route path='/posting' element={<Posting />} />
     </Routes>
   );

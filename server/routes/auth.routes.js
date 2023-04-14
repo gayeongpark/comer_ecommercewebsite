@@ -89,7 +89,7 @@ router.get('/verifyEmail/:token', async (req, res, next) => {
 
 router.post('/login', verifyEmail, async (req, res, next) => {
   try {
-    const { email, password} = req.body;
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
     // console.log(user);
     if (!user) {
