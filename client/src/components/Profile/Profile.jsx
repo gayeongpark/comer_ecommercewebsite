@@ -166,9 +166,9 @@ export default function Profile() {
                         Cancel
                       </button>
                     </div>
-                    <div
-                    className='font-xs text-red-600 mt-2'
-                    >please press save button</div>
+                    <div className='font-xs text-red-600 mt-2'>
+                      please press save button
+                    </div>
                   </dd>
                 )}
               </div>
@@ -387,19 +387,36 @@ export default function Profile() {
                       htmlFor='country'
                       className='block text-sm font-medium leading-6 text-gray-900'
                     >
-                      country
+                      Country
                     </label>
-                    <select
+                    <input
+                     type='text'
                       id='country'
                       name='country'
                       autoComplete='off'
                       value={formData.country}
                       onChange={handleChange}
                       className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                    ></input>
+                  </div>
+                )}
+                {openInputAddress && (
+                  <div className='col-span-6 sm:col-span-3'>
+                    <label
+                      htmlFor='province'
+                      className='block text-sm font-medium leading-6 text-gray-900'
                     >
-                      <option>Select country</option>
-                      <option value='United State'>United State</option>
-                    </select>
+                      State / Province
+                    </label>
+                    <input
+                      type='text'
+                      name='province'
+                      id='province'
+                      autoComplete='off'
+                      value={formData.province}
+                      onChange={handleChange}
+                      className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
+                    />
                   </div>
                 )}
                 {openInputAddress && (
@@ -416,25 +433,6 @@ export default function Profile() {
                       id='city'
                       autoComplete='off'
                       value={formData.city}
-                      onChange={handleChange}
-                      className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
-                    />
-                  </div>
-                )}
-                {openInputAddress && (
-                  <div className='col-span-6 sm:col-span-3'>
-                    <label
-                      htmlFor='region'
-                      className='block text-sm font-medium leading-6 text-gray-900'
-                    >
-                      State / Province
-                    </label>
-                    <input
-                      type='text'
-                      name='province'
-                      id='province'
-                      autoComplete='off'
-                      value={formData.province}
                       onChange={handleChange}
                       className='mt-2 block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6'
                     />

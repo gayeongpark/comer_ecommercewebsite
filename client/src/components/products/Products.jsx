@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { BsSuitHeartFill } from 'react-icons/bs';
+import { BsHeartFill } from 'react-icons/bs';
 import { AiOutlineLeft } from 'react-icons/ai';
 import { AiOutlineRight } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
@@ -8,6 +8,12 @@ import { Link } from 'react-router-dom';
 export default function Products() {
   const [newProductData, setNewProductData] = useState();
   const [slideNumber, setSlideNumber] = useState(0);
+
+  const [isLiked, setIsLiked] = useState(false);
+
+  function handleClick() {
+    setIsLiked(!isLiked);
+  }
 
   const handleMove = (direction, lastIndex) => {
     // console.log('slideNumber before move:', slideNumber);
@@ -85,8 +91,10 @@ export default function Products() {
                     </div>
                   </div>
                   <div className='flex absolute justify-end mt-3 mr-4'>
-                    <button className='flex absolute justify-end mt-2 mr-5'>
-                      <BsSuitHeartFill className=' float-right text-3xl text-white hover:text-red-700 focus:text-indigo' />
+                    <button className='flex absolute justify-end mt-2 mr-5 text-3xl text-red-700'
+                    onClick={handleClick}
+                    >
+                     { isLiked ? <BsHeartFill /> : <BsHeartFill className='text-white' />}
                     </button>
                   </div>
                 </div>
