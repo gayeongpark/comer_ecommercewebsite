@@ -29,9 +29,11 @@ export default function Posting() {
   const [openInputTags, setOpenInputTags] = useState(false);
 
   const optionsLanguage = [
-    { value: 'english', label: 'English' },
-    { value: 'korean', label: 'Korean' },
-    { value: 'spanish', label: 'Spanish' },
+    { value: 'English', label: 'English' },
+    { value: 'Korean', label: 'Korean' },
+    { value: 'Spanish', label: 'Spanish' },
+    { value: 'Franch', label: 'Franch' },
+    { value: 'Chinese', label: 'Chinese' },
   ];
 
   const customStyles = {
@@ -187,35 +189,6 @@ export default function Posting() {
       );
       console.log(response?.data);
       setSuccess('You have successfully posted an experience!');
-      setTitle('');
-      setDescription('');
-      setPerks({
-        food: '',
-        beverage: '',
-        alcohol: '',
-        equipment: '',
-        others: '',
-      });
-      setMinimumAge('');
-      setKidsAllowed(false);
-      setPetsAllowed(false);
-      setMaxGuest('');
-      setLanguage([]);
-      setStartTime('');
-      setEndTime('');
-      setStartDate('');
-      setEndDate('');
-      setTags([]);
-      setPrice('');
-      setCurrency('');
-      setCountry('');
-      setCity('');
-      setState('');
-      setAddress('');
-      setFeature(null);
-      setNotice('');
-      setCancellation1(false);
-      setCancellation2(false);
     } catch (error) {
       console.error(error.response.data);
       setError(error.response.data);
@@ -1107,6 +1080,7 @@ export default function Posting() {
                       id='currency'
                       name='currency'
                       value={currency}
+                      defaultValue='$'
                       onChange={(e) => setCurrency(e.target.value)}
                       className='h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm'
                     >

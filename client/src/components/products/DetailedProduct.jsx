@@ -3,6 +3,10 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { MdLocationOn } from 'react-icons/md';
 import { BsHeart, BsHeartFill } from 'react-icons/bs';
+import { GiForkKnifeSpoon, GiSodaCan, GiCookingPot } from 'react-icons/gi';
+import { BiDrink } from 'react-icons/bi';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import Map, { Marker, NavigationControl } from 'react-map-gl';
 
 export default function DetailedProduct() {
   const { id } = useParams();
@@ -69,12 +73,12 @@ export default function DetailedProduct() {
   return (
     <div className='bg-white'>
       <div className='mx-auto mt-6 max-w-2xl sm:px-6 lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8'>
-        <h1 className='text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl'>
+        <h1 className='text-5xl font-bold tracking-tight text-gray-900 sm:text-3xl'>
           {detailedProductData?.experience?.title}
         </h1>
         <div className='flex items-center justify-between mt-2'>
           <div className='flex items-center'>
-            <div className='text-red-600'>
+            <div className='text-red-700'>
               <MdLocationOn />
             </div>
             <p className='ml-1 text-gray-500 text-sm'>
@@ -149,7 +153,17 @@ export default function DetailedProduct() {
           </>
         )}
         <div className='mx-auto max-w-2xl px-4 pb-16 pt-10 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto,auto,1fr] lg:gap-x-8 lg:px-8 lg:pb-24 lg:pt-16'>
-          <div className='lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8'></div>
+          <div className='lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8'>
+            <div className='flex flex-row mt-2'>
+              {detailedProductData?.experience?.tags.map((tag) => {
+                return (
+                  <div className='flex flex-row bg-red-700 rounded-full mr-2 text-white p-1'>
+                    <div className='px-2 py-1'>#{tag}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Options */}
           <div className='mt-4 lg:row-span-3 lg:mt-0'>
@@ -195,71 +209,250 @@ export default function DetailedProduct() {
           <div className='py-8 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-1'>
             {/* Owner information */}
             {detailedProductData?.owner?.profilePicture && (
-              <div className='flex items-center gap-2 justify-between border-b border-gray-200 py-5'>
-                <div className='flex items-center gap-3'>
-                <div >
-                  <img
-                    className='h-20 w-20 rounded-full'
-                    src={`http://localhost:8000/${detailedProductData.owner.profilePicture}`}
-                    alt='profileImage'
-                  />
-                </div>
-                <div>
-                  <div className='flex text-lg'>
-                    <p>{detailedProductData.owner.firstName}</p>
-                    <p>{detailedProductData.owner.lastName}</p>
+              <div>
+                <div className='flex items-center gap-2 justify-between py-5'>
+                  <div className='flex items-center gap-3'>
+                    <div>
+                      <img
+                        className='h-20 w-20 rounded-full'
+                        src={`http://localhost:8000/${detailedProductData.owner.profilePicture}`}
+                        alt='profileImage'
+                      />
+                    </div>
+                    <div>
+                      <div className='flex text-5xl font-bold tracking-tight text-gray-900 sm:text-3xl'>
+                        <p className='mr-1'>Experience hosted by</p>
+                        <p className='mr-1'>
+                          {detailedProductData.owner.firstName}
+                        </p>
+                        <p>{detailedProductData.owner.lastName}</p>
+                      </div>
+                      <div className='flex text-gray-500 items-center text-sm'>
+                        <p className='text-red-700'>
+                          <MdLocationOn />
+                        </p>
+                        <p>{detailedProductData.owner.city}, </p>
+                        <p>{detailedProductData.owner.country}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className='flex text-gray-500 items-center text-sm'>
-                    <p>
-                      <MdLocationOn />
-                    </p>
-                    <p>{detailedProductData.owner.city}, </p>
-                    <p>{detailedProductData.owner.country}</p>
+                  <div className='flex'>
+                    <button
+                      type='button'
+                      className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                    >
+                      Message
+                    </button>
                   </div>
                 </div>
-                </div>
-                <div>
-                  <button
-                    type='button'
-                    className='flex-inline rounded-md border border-transparent bg-red-700 px-6 py-2 text-md font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                  >
-                    Message
-                  </button>
+                <div
+                  style={{ whiteSpace: 'pre-line' }}
+                  className='border-b border-gray-200'
+                >
+                  {detailedProductData.owner.description}
+                  <div className='mt-2'>
+                    user joined since{' '}
+                    {new Date(
+                      detailedProductData.owner.createdAt
+                    ).getFullYear()}
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Description and details */}
-            <div>
-              <h3 className='sr-only'>Description</h3>
+            <div className='mt-10'>
               <div className='space-y-6'>
-                <p className='text-base text-gray-900'>
+                <h3 className='text-lg font-medium text-gray-900'>
+                  What you'll do
+                </h3>
+                <p
+                  className='text-base text-gray-900'
+                  style={{ whiteSpace: 'pre-line' }}
+                >
                   {detailedProductData?.experience?.description}
                 </p>
               </div>
             </div>
 
+            {/* Language */}
             <div className='mt-10'>
-              <h3 className='text-sm font-medium text-gray-900'>Highlights</h3>
-
-              <div className='mt-4'>
-                {/* <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                  {product.highlights.map((highlight) => (
-                    <li key={highlight} className="text-gray-400">
-                      <span className="text-gray-600">{highlight}</span>
-                    </li>
-                  ))}
-                </ul> */}
+              <h3 className='text-lg font-medium text-gray-900'>Hosted in</h3>
+              <div className='flex mt-5'>
+                {detailedProductData?.experience?.language.map((lan) => {
+                  return (
+                    <div className='flex border-2 border-red-700 mr-4 justify-center items-center p-2 bg-red-700 rounded-full'>
+                      <p className='text-base justify-center items-center text-white'>
+                        {lan}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
+            {/* Perks */}
+            <div className='flex-row mt-10'>
+              <h3 className='text-lg font-medium text-gray-900'>
+                What's included
+              </h3>
+              <div className='mt-5'>
+                <ul className='grid grid-cols-4 gap-4 text-sm'>
+                  {detailedProductData?.experience?.perks?.food && (
+                    <li
+                      key={detailedProductData?.experience?._id}
+                      className='items-center text-gray-400 border-2 p-4 rounded-md'
+                    >
+                      <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
+                        <GiForkKnifeSpoon />
+                      </span>
+                      <span className='flex justify-center text-lg mb-2 text-gray-900 font-bold'>
+                        Food
+                      </span>
+                      <span className='flex text-gray-600 text-md justify-center'>
+                        {detailedProductData?.experience?.perks?.food}
+                      </span>
+                    </li>
+                  )}
+                  {detailedProductData?.experience?.perks?.beverage && (
+                    <li
+                      key={detailedProductData?.experience?._id}
+                      className='items-center text-gray-400 border-2 p-4 rounded-md'
+                    >
+                      <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
+                        <GiSodaCan />
+                      </span>
+                      <span className='flex justify-center text-lg mb-2 text-gray-900 font-bold'>
+                        Beverage
+                      </span>
+                      <span className='flex text-gray-600 text-md justify-center'>
+                        {detailedProductData?.experience?.perks?.beverage}
+                      </span>
+                    </li>
+                  )}
+                  {detailedProductData?.experience?.perks?.equipment && (
+                    <li
+                      key={detailedProductData?.experience?._id}
+                      className='items-center text-gray-400 border-2 p-4 rounded-md'
+                    >
+                      <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
+                        <GiCookingPot />
+                      </span>
+                      <span className='flex justify-center text-lg mb-2 text-gray-900 font-bold'>
+                        Equipment
+                      </span>
+                      <span className='flex text-gray-600 text-md justify-center'>
+                        {detailedProductData?.experience?.perks.equipment}
+                      </span>
+                    </li>
+                  )}
+                  {detailedProductData?.experience?.perks?.alcohol && (
+                    <li
+                      key={detailedProductData?.experience?._id}
+                      className='items-center text-gray-400 border-2 p-4 sm:p-2 rounded-md'
+                    >
+                      <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
+                        <BiDrink />
+                      </span>
+                      <span className='flex justify-center text-lg mb-2 text-gray-900 font-bold'>
+                        Alcohol
+                      </span>
+                      <span className='flex text-gray-600 text-md justify-center'>
+                        {detailedProductData?.experience?.perks?.alcohol}
+                      </span>
+                    </li>
+                  )}
+                  {detailedProductData?.experience?.perks?.others && (
+                    <li
+                      key={detailedProductData?.experience?._id}
+                      className='items-center text-gray-400 border-2 p-4 rounded-md'
+                    >
+                      <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
+                        <GiForkKnifeSpoon />
+                      </span>
+                      <span className='flex justify-center text-lg mb-2 text-gray-900 font-bold'>
+                        Others
+                      </span>
+                      <span className='flex text-gray-600 text-md justify-center'>
+                        {detailedProductData?.experience?.perks?.others}
+                      </span>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            </div>
+
+            {/* Location */}
             <div className='mt-10'>
-              <h2 className='text-sm font-medium text-gray-900'>Notice</h2>
-              <div className='mt-4 space-y-6'>
-                <p className='text-sm text-gray-600'>
-                  {' '}
-                  {detailedProductData?.experience?.notice}
-                </p>
+              <h3 className='text-lg font-medium text-gray-900'>
+                Where we will meet
+              </h3>
+              <div className='flex mt-5'>
+                {detailedProductData?.experience?.coordinates && (
+                  <Map
+                    key={detailedProductData?.owner?._id}
+                    mapboxAccessToken={process.env.REACT_APP_MAPBOXAPIKEY}
+                    initialViewState={{
+                      longitude: detailedProductData?.experience?.longitude,
+                      latitude: detailedProductData?.experience?.latitude,
+                      zoom: 15,
+                    }}
+                    style={{ width: 600, height: 400 }}
+                    mapStyle='mapbox://styles/mapbox/streets-v11'
+                  >
+                    <Marker
+                      longitude={detailedProductData?.experience?.longitude}
+                      latitude={detailedProductData?.experience?.latitude}
+                      anchor='bottom'
+                      zoom={15}
+                    >
+                      <MdLocationOn />
+                    </Marker>
+                    <NavigationControl />
+                  </Map>
+                )}
+              </div>
+              <p>{detailedProductData?.experience?.fullAddress}</p>
+            </div>
+
+            {/* Things to know */}
+            <div className='mt-10'>
+              <h3 className='text-lg font-medium text-gray-900'>
+                Things to know
+              </h3>
+              <div className='grid grid-cols-2 gap-4 mt-2'>
+                <div>
+                  <p className='text-md text-gray-600 text-bold'>
+                    Requirement
+                  </p>
+                  {detailedProductData?.experience?.kidsAllowed === true && (
+                    <p className='mt-4'>
+                      Guest can bring kids under 4 years
+                    </p>
+                  )}
+                  {detailedProductData?.experience?.petsAllowed === true && (
+                    <p className='mt-4'>Guest can bring their pets</p>
+                  )}
+                </div>
+                <div>
+                  <p className='text-md text-gray-600 text-bold'>
+                    Cancellation policy
+                  </p>
+                  {detailedProductData?.experience?.cancellation1 === true && (
+                    <p className='mt-4'>
+                      Guests can cancel until 7 days before the Experience start
+                      time for a full refund, or within 24 hours of booking as
+                      long as the booking is made more than 48 hours before the
+                      start time.
+                    </p>
+                  )}
+                  {detailedProductData?.experience?.cancellation2 === true && (
+                    <p className='mt-4'>
+                      Guests can cancel until 24 hours before the Experience
+                      start time for a full refund.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -25,17 +25,17 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-//get user's all posts
+//get user's all post
 router.get('/profile/:id', async (req, res, next) => {
   try {
-    const { id } = req.params.id;
-    const user = await User.findOne({ id });
-    console.log(user.id);
-    console.log(user._id);
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
     const experience = await Experience.find({ userId: user.id });
-    console.log(experience.userId);
-    if (!experience) {
-      return res.status(404).json('Experience not found');
+    if (experience.length === 0) {
+      return res.status(404).json('No experiences found for this user');
     }
     res.status(200).json(experience);
   } catch (error) {
@@ -115,6 +115,9 @@ router.post(
       const runningTime = duration.asMinutes();
 
       // console.log('running time:', runningTime);
+      if (runningTime <= 0) {
+        res.status(405).json('please check out the start time and end time!');
+      }
 
       const newExperience = new Experience({
         userId: req.user.id,

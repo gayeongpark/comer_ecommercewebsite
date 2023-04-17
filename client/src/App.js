@@ -11,7 +11,7 @@ import MyProfile from './pages/MyProfile';
 import Hosting from './pages/HostingExperience';
 import VertifiecEmail from './pages/VertifiecEmail';
 import DeleteUser from './pages/DeleteUser';
-// import ProfileSK from './components/Profile/ProfileSK';
+import MyExperience from './pages/MyExperience';
 
 export default function App() {
   return (
@@ -27,6 +27,7 @@ export default function App() {
       <Route path='/hostingExperience' element={<Hosting />} />
       <Route path='/product/:id' element={<Product />} />
       <Route path='/posting' element={<Posting />} />
+      <Route path='/myExperience/:id' element={<MyExperience />} />
     </Routes>
   );
 }

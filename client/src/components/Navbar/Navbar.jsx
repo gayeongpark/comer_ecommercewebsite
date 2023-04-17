@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../../api/firebase';
-import { logoutGoogle } from '../../api/firebase';
+// import { logoutGoogle } from '../../api/firebase';
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -141,7 +141,7 @@ export default function Navbar() {
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    onClick={logoutGoogle}
+                                    // onClick={logoutGoogle}
                                     href='#'
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
@@ -157,7 +157,7 @@ export default function Navbar() {
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    onClick={logoutGoogle}
+                                    // onClick={logoutGoogle}
                                     href='#'
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
@@ -189,7 +189,7 @@ export default function Navbar() {
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    onClick={logout}
+                                    // onClick={logout}
                                     href='#'
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
@@ -202,26 +202,28 @@ export default function Navbar() {
                               </Menu.Item>
                             )}
                             {(authUser || userGoogle) && (
-                              <Menu.Item>
-                                {({ active }) => (
-                                  <div
-                                    onClick={logout}
-                                    href='#'
-                                    className={classNames(
-                                      active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm text-gray-700'
-                                    )}
-                                  >
-                                    Hosted experinece
-                                  </div>
-                                )}
-                              </Menu.Item>
+                              <Link to={`/myExperience/${authUser?.id}`}>
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <div
+                                      // onClick={logout}
+                                      href='#'
+                                      className={classNames(
+                                        active ? 'bg-gray-100' : '',
+                                        'block px-4 py-2 text-sm text-gray-700'
+                                      )}
+                                    >
+                                      Your experinece
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              </Link>
                             )}
                             {(authUser || userGoogle) && (
                               <Menu.Item>
                                 {({ active }) => (
                                   <div
-                                    onClick={logout}
+                                    // onClick={logout}
                                     href='#'
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
@@ -238,7 +240,7 @@ export default function Navbar() {
                                 <Menu.Item>
                                   {({ active }) => (
                                     <div
-                                      onClick={logoutGoogle}
+                                      // onClick={logoutGoogle}
                                       href='#'
                                       className={classNames(
                                         active ? 'bg-gray-100' : '',
