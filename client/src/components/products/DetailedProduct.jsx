@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { MdLocationOn } from 'react-icons/md';
+import {
+  MdLocationOn,
+  MdOutlinePets,
+  // MdFreeCancellation,
+} from 'react-icons/md';
+import { useSelector } from 'react-redux';
+import { FaBaby } from 'react-icons/fa';
 import { BsHeart, BsHeartFill } from 'react-icons/bs';
 import { GiForkKnifeSpoon, GiSodaCan, GiCookingPot } from 'react-icons/gi';
 import { BiDrink } from 'react-icons/bi';
@@ -13,26 +19,40 @@ export default function DetailedProduct() {
   const [detailedProductData, setDetailedProductData] = useState();
   const [isLiked, setIsLiked] = useState(false);
 
+  const authUser = useSelector((state) => state.authUser.value);
+
   const [showAllPhotos, setShowAllPhotos] = useState(false);
 
-  function handleClick() {
+  const handleLikes = async () => {
+    if (detailedProductData?.experience?.likes.includes(authUser.id)) {
+      // User has already liked the product, so we need to remove their ID from the likes array
+      const updatedLikes = detailedProductData.experience.likes.filter(
+        (id) => id !== authUser.id
+      );
+      await axios.put(`/users/likes/${id}`, updatedLikes, {
+        withCredentials: true,
+      });
+    } else {
+      // User has not liked the product yet, so we need to add their ID to the likes array
+      const updatedLikes = [
+        ...detailedProductData.experience.likes,
+        authUser.id,
+      ];
+      await axios.put(`/users/likes/${id}`, updatedLikes, {
+        withCredentials: true,
+      });
+    }
     setIsLiked(!isLiked);
-  }
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axios.get(`/experiences/${id}`);
-        const productsDetailed = response.data;
-        console.log(productsDetailed);
-        setDetailedProductData(productsDetailed);
-        // console.log(detailedProductData);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    fetchData();
-  }, [id]);
+    const fetchDetailedProductData = async () => {
+      const { data } = await axios.get(`/experiences/${id}`);
+      setDetailedProductData(data);
+      setIsLiked(data.experience.likes.includes(authUser.id));
+    };
+    fetchDetailedProductData();
+  }, [id, authUser]);
 
   if (showAllPhotos) {
     return (
@@ -61,7 +81,7 @@ export default function DetailedProduct() {
           </div>
           {detailedProductData?.experience?.files?.length > 0 &&
             detailedProductData?.experience?.files.map((photo) => (
-              <div>
+              <div key={photo}>
                 <img src={`http://localhost:8000/${photo}`} alt='allImage' />
               </div>
             ))}
@@ -87,7 +107,10 @@ export default function DetailedProduct() {
             </p>
           </div>
           <div className='flex flex-row-reverse items-center'>
-            <div className='text-3xl text-red-700' onClick={handleClick}>
+            <div
+              className='text-3xl text-red-700 cursor-pointer'
+              onClick={handleLikes}
+            >
               {isLiked ? <BsHeartFill /> : <BsHeart />}
             </div>
           </div>
@@ -157,7 +180,10 @@ export default function DetailedProduct() {
             <div className='flex flex-row mt-2'>
               {detailedProductData?.experience?.tags.map((tag) => {
                 return (
-                  <div className='flex flex-row bg-red-700 rounded-full mr-2 text-white p-1'>
+                  <div
+                    key={tag}
+                    className='flex flex-row bg-red-700 rounded-full mr-2 text-white p-1'
+                  >
                     <div className='px-2 py-1'>#{tag}</div>
                   </div>
                 );
@@ -173,12 +199,12 @@ export default function DetailedProduct() {
               {detailedProductData?.experience?.price}
             </p>
 
-            {/* Reviews */}
-            <div className='mt-6'>
+            {/* Appointment */}
+            {/* <div className='mt-6'>
               <h3 className='sr-only'>Reviews</h3>
               <div className='flex items-center'>
-                <div className='flex items-center'>
-                  {/* {[0, 1, 2, 3, 4].map((rating) => (
+                <div className='flex items-center'> */}
+            {/* {[0, 1, 2, 3, 4].map((rating) => (
                     <StarIcon
                       key={rating}
                       className={classNames(
@@ -188,13 +214,13 @@ export default function DetailedProduct() {
                       aria-hidden="true"
                     />
                   ))} */}
-                </div>
-                {/* <p className="sr-only">{reviews.average} out of 5 stars</p>
+            {/* </div> */}
+            {/* <p className="sr-only">{reviews.average} out of 5 stars</p>
                 <a href={reviews.href} className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500">
                   {reviews.totalCount} reviews
                 </a> */}
-              </div>
-            </div>
+            {/* </div>
+            </div> */}
 
             <form className='mt-10'>
               <button
@@ -220,19 +246,27 @@ export default function DetailedProduct() {
                       />
                     </div>
                     <div>
-                      <div className='flex text-5xl font-bold tracking-tight text-gray-900 sm:text-3xl'>
-                        <p className='mr-1'>Experience hosted by</p>
-                        <p className='mr-1'>
+                      <div className='flex flex-wrap justify-center text-center text-5xl font-bold tracking-tight text-gray-900 sm:text-3xl'>
+                        <p className='mb-1 sm:mr-2 sm:mb-0'>
+                          Experience hosted by
+                        </p>
+                        <p className='mb-1 sm:mr-1 sm:mb-0'>
                           {detailedProductData.owner.firstName}
                         </p>
-                        <p>{detailedProductData.owner.lastName}</p>
+                        <p className='mb-1'>
+                          {detailedProductData.owner.lastName}
+                        </p>
                       </div>
                       <div className='flex text-gray-500 items-center text-sm'>
                         <p className='text-red-700'>
                           <MdLocationOn />
                         </p>
-                        <p>{detailedProductData.owner.city}, </p>
-                        <p>{detailedProductData.owner.country}</p>
+                        <p className='mb-1'>
+                          {detailedProductData.owner.city},{' '}
+                        </p>
+                        <p className='mb-1'>
+                          {detailedProductData.owner.country}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -250,8 +284,8 @@ export default function DetailedProduct() {
                   className='border-b border-gray-200'
                 >
                   {detailedProductData.owner.description}
-                  <div className='mt-2'>
-                    user joined since{' '}
+                  <div className='flex justify-end mt-2 text-gray-400'>
+                    {detailedProductData.owner.firstName} joined since{' '}
                     {new Date(
                       detailedProductData.owner.createdAt
                     ).getFullYear()}
@@ -279,9 +313,12 @@ export default function DetailedProduct() {
             <div className='mt-10'>
               <h3 className='text-lg font-medium text-gray-900'>Hosted in</h3>
               <div className='flex mt-5'>
-                {detailedProductData?.experience?.language.map((lan) => {
+                {detailedProductData?.experience?.language.map((lan, index) => {
                   return (
-                    <div className='flex border-2 border-red-700 mr-4 justify-center items-center p-2 bg-red-700 rounded-full'>
+                    <div
+                      key={index}
+                      className='flex border-2 border-red-700 mr-4 justify-center items-center p-2 bg-red-700 rounded-full'
+                    >
                       <p className='text-base justify-center items-center text-white'>
                         {lan}
                       </p>
@@ -300,7 +337,7 @@ export default function DetailedProduct() {
                 <ul className='grid grid-cols-4 gap-4 text-sm'>
                   {detailedProductData?.experience?.perks?.food && (
                     <li
-                      key={detailedProductData?.experience?._id}
+                      key='food'
                       className='items-center text-gray-400 border-2 p-4 rounded-md'
                     >
                       <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
@@ -316,7 +353,7 @@ export default function DetailedProduct() {
                   )}
                   {detailedProductData?.experience?.perks?.beverage && (
                     <li
-                      key={detailedProductData?.experience?._id}
+                      key='beverage'
                       className='items-center text-gray-400 border-2 p-4 rounded-md'
                     >
                       <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
@@ -332,7 +369,7 @@ export default function DetailedProduct() {
                   )}
                   {detailedProductData?.experience?.perks?.equipment && (
                     <li
-                      key={detailedProductData?.experience?._id}
+                      key='equipment'
                       className='items-center text-gray-400 border-2 p-4 rounded-md'
                     >
                       <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
@@ -348,7 +385,7 @@ export default function DetailedProduct() {
                   )}
                   {detailedProductData?.experience?.perks?.alcohol && (
                     <li
-                      key={detailedProductData?.experience?._id}
+                      key='alcohol'
                       className='items-center text-gray-400 border-2 p-4 sm:p-2 rounded-md'
                     >
                       <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
@@ -364,7 +401,7 @@ export default function DetailedProduct() {
                   )}
                   {detailedProductData?.experience?.perks?.others && (
                     <li
-                      key={detailedProductData?.experience?._id}
+                      key='others'
                       className='items-center text-gray-400 border-2 p-4 rounded-md'
                     >
                       <span className='flex justify-center text-red-700 text-3xl mb-2 font-bold'>
@@ -422,16 +459,18 @@ export default function DetailedProduct() {
               </h3>
               <div className='grid grid-cols-2 gap-4 mt-2'>
                 <div>
-                  <p className='text-md text-gray-600 text-bold'>
-                    Requirement
-                  </p>
+                  <p className='text-md text-gray-600 text-bold'>Requirement</p>
                   {detailedProductData?.experience?.kidsAllowed === true && (
-                    <p className='mt-4'>
+                    <p className='flex mt-4 items-center'>
+                      <FaBaby className='mr-2' />
                       Guest can bring kids under 4 years
                     </p>
                   )}
                   {detailedProductData?.experience?.petsAllowed === true && (
-                    <p className='mt-4'>Guest can bring their pets</p>
+                    <p className='flex mt-4 items-center'>
+                      <MdOutlinePets className='mr-2' />
+                      Guest can bring their pets
+                    </p>
                   )}
                 </div>
                 <div>
@@ -439,7 +478,8 @@ export default function DetailedProduct() {
                     Cancellation policy
                   </p>
                   {detailedProductData?.experience?.cancellation1 === true && (
-                    <p className='mt-4'>
+                    <p className='flex mt-4 items-center'>
+                      {/* <MdFreeCancellation className='mr-2' /> */}
                       Guests can cancel until 7 days before the Experience start
                       time for a full refund, or within 24 hours of booking as
                       long as the booking is made more than 48 hours before the
@@ -447,7 +487,8 @@ export default function DetailedProduct() {
                     </p>
                   )}
                   {detailedProductData?.experience?.cancellation2 === true && (
-                    <p className='mt-4'>
+                    <p className='flex mt-4 items-center'>
+                      {/* <MdFreeCancellation className='mr-2' /> */}
                       Guests can cancel until 24 hours before the Experience
                       start time for a full refund.
                     </p>

@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const { authenticateUser } = require('../middleware/authMiddleware.js');
 const User = require('../models/User.model');
+const Experience = require('../models/Experience.model');
 const router = express.Router();
 
 //get user
@@ -107,6 +108,35 @@ router.delete('/delete/:id', authenticateUser, async (req, res, next) => {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.status(200).json('We are deleting your account. please hold on...');
+  } catch (error) {
+    next(error);
+  }
+});
+
+//likes a posted experience
+router.put('/likes/:id', authenticateUser, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const experience = await Experience.findById(req.params.id);
+    if (!experience) {
+      return res.status(404).json('experience not found');
+    }
+    const index = experience.likes.indexOf(userId);
+    if (index === -1) {
+      // User has not liked the experience before, add to likes array
+      await Experience.updateOne(
+        { _id: req.params.id },
+        { $push: { likes: userId } }
+      );
+      return res.status(200).json('The experience has been liked.');
+    } else {
+      // User has already liked the experience before, remove from likes array
+      await Experience.updateOne(
+        { _id: req.params.id },
+        { $pull: { likes: userId } }
+      );
+      return res.status(200).json('The experience has been unliked.');
+    }
   } catch (error) {
     next(error);
   }
