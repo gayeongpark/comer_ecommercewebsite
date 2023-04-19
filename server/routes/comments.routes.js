@@ -1,9 +1,10 @@
 const express = require('express');
 const Experience = require('../models/Experience.model');
 const Comment = require('../models/Comment.model');
-const authenticatedUser = require('../middleware/authMiddleware');
+const { authenticateUser } = require('../middleware/authMiddleware.js');
 const router = express.Router();
 
+//get all comment of a certain product
 router.get('/:experienceId', async (req, res, next) => {
   try {
     const comments = await Comment.find({
@@ -15,24 +16,24 @@ router.get('/:experienceId', async (req, res, next) => {
   }
 });
 
-router.post('/', authenticatedUser, async (req, res, next) => {
+router.post('/', authenticateUser, async (req, res, next) => {
   try {
-    const newComment = Comment.create({ ...req.body, userId: req.user.id });
-    res.status(200).send(newComment);
+    const newComment = await Comment.create({ ...req.body, userId: req.user.id });
+    console.log(newComment)
+    res.status(200).json(newComment);
   } catch (error) {
     next(error);
   }
 });
 
-router.delete('/:id', authenticatedUser, async (req, res, next) => {
+router.delete('/delete/:id', authenticateUser, async (req, res, next) => {
   try {
-    const comment = await Comment.findById(res.params.id);
-    const exeperience = await Experience.findById(res.params.id);
-    if (req.user.id === comment.userId || req.user.id === exeperience.userId) {
+    const comment = await Comment.findById(req.params.id);
+    if (req.user.id === comment.userId) {
       await Comment.findByIdAndDelete(req.params.id);
       res.status(200).json('The comment has been deleted.');
     } else {
-      res.status(403).json('You can delete ony your comment!');
+      res.status(403).json('You can delete only your own comments!');
     }
   } catch (error) {
     next(error);

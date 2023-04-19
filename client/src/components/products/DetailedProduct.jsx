@@ -13,6 +13,7 @@ import { GiForkKnifeSpoon, GiSodaCan, GiCookingPot } from 'react-icons/gi';
 import { BiDrink } from 'react-icons/bi';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Map, { Marker, NavigationControl } from 'react-map-gl';
+import Comments from './Comments';
 
 export default function DetailedProduct() {
   const { id } = useParams();
@@ -234,16 +235,24 @@ export default function DetailedProduct() {
 
           <div className='py-8 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-1'>
             {/* Owner information */}
-            {detailedProductData?.owner?.profilePicture && (
+            {detailedProductData?.owner && (
               <div>
                 <div className='flex items-center gap-2 justify-between py-5'>
                   <div className='flex items-center gap-3'>
                     <div>
-                      <img
-                        className='h-20 w-20 rounded-full'
-                        src={`http://localhost:8000/${detailedProductData.owner.profilePicture}`}
-                        alt='profileImage'
-                      />
+                      {detailedProductData.owner.profilePicture ? (
+                        <img
+                          className='h-20 w-20 rounded-full'
+                          src={`http://localhost:8000/${detailedProductData.owner.profilePicture}`}
+                          alt='profileImage'
+                        />
+                      ) : (
+                        <img
+                          className='h-20 w-20 rounded-full'
+                          src='https://www.donut.app/assets/donut.png'
+                          alt='profileImage'
+                        />
+                      )}
                     </div>
                     <div>
                       <div className='flex flex-wrap justify-center text-center text-5xl font-bold tracking-tight text-gray-900 sm:text-3xl'>
@@ -494,6 +503,12 @@ export default function DetailedProduct() {
                     </p>
                   )}
                 </div>
+              </div>
+            </div>
+            <div className='mt-10'>
+              <h3 className='text-lg font-medium text-gray-900'>Comments</h3>
+              <div className='flex mt-5'>
+                <Comments experienceId={detailedProductData?.experience?._id} />
               </div>
             </div>
           </div>

@@ -49,6 +49,9 @@ app.use('/auth', authRoutes);
 const experiencesRoutes = require('./routes/experiences.routes');
 app.use('/experiences', experiencesRoutes);
 
+const commentsRoutes = require('./routes/comments.routes');
+app.use('/comments', commentsRoutes);
+
 // app.use((err, req, res, next) => {
 //   const errorStatus = err.status || 500;
 //   const errorMessge = err.message || 'Something went wrong';

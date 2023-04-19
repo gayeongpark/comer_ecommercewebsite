@@ -9,7 +9,7 @@ let refresh = false;
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error?.response?.status && !refresh) {
+    if (error?.response?.status === 401 && !refresh) {
       try {
         refresh = true;
         const response = await axios.post(

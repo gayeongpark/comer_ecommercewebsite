@@ -6,13 +6,19 @@ const commentSchema = new Schema(
       type: String,
       required: true,
     },
-    videoId: {
+    experienceId: {
       type: String,
       required: true,
     },
-    desc: {
+    description: {
       type: String,
       required: true,
+    },
+    likes: {
+      type: [String],
+    },
+    dislikes: {
+      type: [String],
     },
   },
   { timestamps: true }
