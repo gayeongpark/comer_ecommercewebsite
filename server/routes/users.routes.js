@@ -118,24 +118,28 @@ router.put('/likes/:id', authenticateUser, async (req, res, next) => {
   try {
     const userId = req.user.id;
     const experience = await Experience.findById(req.params.id);
+    // console.log('experience id:', experience);
     if (!experience) {
       return res.status(404).json('experience not found');
     }
     const index = experience.likes.indexOf(userId);
+    // console.log('index:', index);
     if (index === -1) {
+      // console.log('The experience has been liked.')
       // User has not liked the experience before, add to likes array
       await Experience.updateOne(
         { _id: req.params.id },
         { $push: { likes: userId } }
       );
-      return res.status(200).json('The experience has been liked.');
+      return res.status(200).json(experience);
     } else {
       // User has already liked the experience before, remove from likes array
+      // console.log('The experience has been unliked.')
       await Experience.updateOne(
         { _id: req.params.id },
         { $pull: { likes: userId } }
       );
-      return res.status(200).json('The experience has been unliked.');
+      return res.status(200).json(experience);
     }
   } catch (error) {
     next(error);

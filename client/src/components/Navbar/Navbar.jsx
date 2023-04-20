@@ -20,7 +20,7 @@ export default function Navbar() {
   const dispatch = useDispatch();
 
   const authUser = useSelector((state) => state.authUser.value);
-  console.log(authUser);
+  // console.log(authUser);
 
   const logout = async () => {
     try {

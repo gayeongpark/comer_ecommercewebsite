@@ -12,6 +12,7 @@ import Hosting from './pages/HostingExperience';
 import VertifiecEmail from './pages/VertifiecEmail';
 import DeleteUser from './pages/DeleteUser';
 import MyExperience from './pages/MyExperience';
+import EditProduct from './pages/EditProduct';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
       <Route path='/product/:id' element={<Product />} />
       <Route path='/posting' element={<Posting />} />
       <Route path='/myExperience/:id' element={<MyExperience />} />
+      <Route path='/myExperience/edit' element={<EditProduct />} />
     </Routes>
   );
 }

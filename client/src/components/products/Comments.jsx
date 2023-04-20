@@ -22,14 +22,14 @@ export default function Comments({ experienceId }) {
     fetchComments();
   }, [experienceId]);
 
-  const fetchComments = async () => {
-    try {
-      const { data } = await axios.get(`/comments/${experienceId}`);
-      // console.log(data);
-      setComments(data);
-      // console.log(comments);
-    } catch (error) {}
-  };
+  // const fetchComments = async () => {
+  //   try {
+  //     const { data } = await axios.get(`/comments/${experienceId}`);
+  //     // console.log(data);
+  //     setComments(data);
+  //     // console.log(comments);
+  //   } catch (error) {}
+  // };
 
   const handleCommentSubmit = async (event) => {
     if (event.key === 'Enter') {
@@ -39,7 +39,7 @@ export default function Comments({ experienceId }) {
           experienceId: experienceId,
         });
         console.log(response.data);
-        fetchComments();
+        // fetchComments();
         setComments((comments) => [response.data, ...comments]);
         setNewComment('');
         setError('');

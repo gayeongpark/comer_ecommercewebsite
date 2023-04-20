@@ -161,15 +161,16 @@ router.put(':id/updateExperience', authenticateUser, async (req, res, next) => {
 
 //delete a post
 router.delete(
-  ':id/updateAExperience',
+  '/updateAExperience/:id',
   authenticateUser,
   async (req, res, next) => {
     try {
-      console.log('deleting a activity for now');
-      const { id } = req.params.id;
+      console.log('deleting an experience for now');
+      const { id } = req.params;
       const experience = await Experience.findById(id);
+      // console.log(experience);
       if (!experience) {
-        res.status(404).json('The exeperience cannot be found!');
+        res.status(404).json('The experience cannot be found!');
       }
       if (req.user.id === experience.userId) {
         await Experience.findByIdAndDelete(req.params.id);

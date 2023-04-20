@@ -38,7 +38,6 @@ export default function Products() {
       try {
         const response = await axios.get('/experiences/');
         const products = response.data;
-        console.log(products);
         setNewProductData(
           products.map((product) => ({
             ...product,
@@ -52,6 +51,26 @@ export default function Products() {
 
     fetchData();
   }, [authUser]);
+
+  // const handleLikes = async (productId) => {
+  //   try {
+  //     await axios.put(`/users/likes/${productId}`);
+  //     const response = await axios.get(`/experiences/${productId}`);
+  //     console.log(response?.data?.experience._id);
+  //     if (
+  //       response?.data?.experience?.likes.includes(authUser.id) &
+  //       (response?.data?.experience._id === productId)
+  //     ) {
+  //       setIsLiked(true);
+  //       console.log('isLiked:', isLiked);
+  //     } else {
+  //       setIsLiked(false);
+  //       console.log('isLiked:', isLiked);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const handleLikes = async (productId) => {
     try {
@@ -67,6 +86,7 @@ export default function Products() {
       console.error(error);
     }
   };
+  // console.log(newProductData);
 
   return (
     <div className='bg-white'>

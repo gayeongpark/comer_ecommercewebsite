@@ -38,7 +38,7 @@ export default function Login() {
         withCredentials: true,
       });
       const user = response.data;
-      console.log(user);
+      // console.log(user);
       dispatch(setAuthUser(user));
       //coverting setAuthUser(false) into (true)
       // authUser(user);
