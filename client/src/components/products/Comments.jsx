@@ -13,7 +13,9 @@ export default function Comments({ experienceId }) {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const { data } = await axios.get(`/comments/${experienceId}`);
+        const { data } = await axios.get(`/comments/${experienceId}`, {
+          withCredentials: true,
+        });
         // console.log(data);
         setComments(data);
         // console.log(comments);
@@ -22,22 +24,20 @@ export default function Comments({ experienceId }) {
     fetchComments();
   }, [experienceId]);
 
-  // const fetchComments = async () => {
-  //   try {
-  //     const { data } = await axios.get(`/comments/${experienceId}`);
-  //     // console.log(data);
-  //     setComments(data);
-  //     // console.log(comments);
-  //   } catch (error) {}
-  // };
-
   const handleCommentSubmit = async (event) => {
     if (event.key === 'Enter') {
       try {
-        const response = await axios.post('/comments/', {
-          description: newComment,
-          experienceId: experienceId,
-        });
+        const response = await axios.post(
+          '/comments/',
+          {
+            description: newComment,
+            experienceId: experienceId,
+          },
+          {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true,
+          }
+        );
         console.log(response.data);
         // fetchComments();
         setComments((comments) => [response.data, ...comments]);

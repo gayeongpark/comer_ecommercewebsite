@@ -38,7 +38,9 @@ export default function Comment({ comment }) {
         throw new Error('Comment does not have an _id property.');
       }
       setLoadingDelete(true); // set loading state to true
-      await axios.delete(`/comments/delete/${comment._id}`);
+      await axios.delete(`/comments/delete/${comment._id}`, {
+        withCredentials: true,
+      });
       setDeleted(true); // set deleted state to true
     } catch (error) {
     } finally {
@@ -49,7 +51,7 @@ export default function Comment({ comment }) {
   if (loadingDelete) {
     // if the delete request is in progress, show a loading spinner
     return (
-      <div role='status'>
+      <div className='flex m-4' role='status'>
         <svg
           aria-hidden='true'
           className='w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-red-600 items-center'

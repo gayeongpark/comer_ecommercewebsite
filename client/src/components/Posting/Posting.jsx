@@ -52,7 +52,7 @@ export default function Posting() {
     (res) => {
       const feature = res.features[0];
       setFeature(feature);
-      console.log(feature);
+      // console.log(feature);
     },
     [setFeature]
   );
@@ -78,7 +78,7 @@ export default function Posting() {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [price, setPrice] = useState('');
-  const [currency, setCurrency] = useState('');
+  const [currency, setCurrency] = useState('$');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -177,17 +177,13 @@ export default function Posting() {
     formData.append('cancellation2', cancellation2);
 
     try {
-      const response = await axios.post(
-        '/experiences/createExperience',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          withCredentials: true,
-        }
-      );
-      console.log(response?.data);
+      await axios.post('/experiences/createExperience', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
+      // console.log(response?.data);
       setSuccess('You have successfully posted an experience!');
     } catch (error) {
       console.error(error.response.data);
@@ -1080,10 +1076,10 @@ export default function Posting() {
                       id='currency'
                       name='currency'
                       value={currency}
-                      defaultValue='$'
                       onChange={(e) => setCurrency(e.target.value)}
                       className='h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm'
                     >
+                      <option>Currency</option>
                       <option value='$'>USD</option>
                       <option value='€'>EUR</option>
                       <option value='₩'>KRW</option>

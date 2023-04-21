@@ -1412,4 +1412,3 @@ export default function EditPost() {
     </div>
   );
 }
-

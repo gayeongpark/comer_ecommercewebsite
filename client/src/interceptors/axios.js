@@ -4,11 +4,10 @@ import axios from 'axios';
 //In this case, interceptors are being used to automatically refresh the user's access token when it has expired.
 //By using an interceptor, the process of refreshing the access token can be handled automatically without the need for the user to manually log in again, providing a better user experience.
 
-let refresh = false;
-
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
+    let refresh = false;
     if (error?.response?.status === 401 && !refresh) {
       try {
         refresh = true;
