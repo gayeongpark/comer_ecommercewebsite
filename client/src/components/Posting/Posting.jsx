@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HiOutlinePhotograph } from 'react-icons/hi';
 import { DateRangePicker } from 'react-date-range';
 import { MdOutlineCancel } from 'react-icons/md';
@@ -13,6 +13,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 const animatedComponents = makeAnimated();
 
 export default function Posting() {
+  const navigate = useNavigate();
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [openInputImage, setOpenInputImage] = useState(false);
@@ -185,6 +187,9 @@ export default function Posting() {
       });
       // console.log(response?.data);
       setSuccess('You have successfully posted an experience!');
+      setTimeout(() => {
+        navigate('/');
+      }, 2000); // wait for 2 seconds before navigating to home page
     } catch (error) {
       console.error(error.response.data);
       setError(error.response.data);
@@ -261,10 +266,10 @@ export default function Posting() {
                         multiple
                       />
                     </label>
-                    <p className='pl-1'>or drag and drop</p>
+                    {/* <p className='pl-1'>or drag and drop</p> */}
                   </div>
                   <p className='text-xs leading-5 text-gray-600'>
-                    PNG, JPG, GIF up to 10MB
+                    PNG, JPG, GIF up to 5 files
                   </p>
                 </div>
               )}
