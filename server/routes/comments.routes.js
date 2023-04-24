@@ -19,7 +19,7 @@ router.get('/:experienceId', async (req, res, next) => {
 router.post('/', authenticateUser, async (req, res, next) => {
   try {
     const newComment = await Comment.create({ ...req.body, userId: req.user.id });
-    console.log(newComment)
+    // console.log(newComment)
     res.status(200).json(newComment);
   } catch (error) {
     next(error);

@@ -22,7 +22,7 @@ export default function Comments({ experienceId }) {
       } catch (error) {}
     };
     fetchComments();
-  }, [experienceId]);
+  }, [experienceId, comments]);
 
   const handleCommentSubmit = async (event) => {
     if (event.key === 'Enter') {

@@ -134,30 +134,53 @@ router.post(
 );
 
 //update a post
-router.put(':id/updateExperience', authenticateUser, async (req, res, next) => {
-  try {
-    console.log('updateing a activity for now');
-    const { id } = req.params.id;
-    const experience = await Experience.findById(id);
-    if (!experience) {
-      res.status(404).json('The exeperience cannot be found!');
-    }
-    if (req.user.id === experience.userId) {
-      const updateExperience = await Experience.findByIdAndUpdate(
-        req.params.id,
+router.put(
+  '/:id/updateExperience',
+  authenticateUser,
+  upload.array('files', 5),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const experience = await Experience.findById(id);
+      if (!experience) {
+        return res.status(404).json('The experience cannot be found!');
+      }
+      if (req.user.id !== experience.userId) {
+        return res.status(401).json('You can only update your own experience!');
+      }
+      let imageUrls = [];
+      if (req.files && req.files.length > 0) {
+        imageUrls = req.files.map((file) => file.path.replace(/\\/g, '/'));
+      }
+      const { startTime, endTime } = req.body;
+      const updatedExperience = { files: imageUrls, ...req.body };
+      if (
+        startTime &&
+        endTime &&
+        (startTime !== experience.startTime || endTime !== experience.endTime)
+      ) {
+        const startMoment = moment(startTime, 'h:mm A');
+        const endMoment = moment(endTime, 'h:mm A');
+        const duration = moment.duration(endMoment.diff(startMoment));
+        const runningTime = duration.asMinutes();
+        if (runningTime <= 0) {
+          return res.status(405).json('Please check the start and end times!');
+        }
+        updatedExperience.runningTime = runningTime;
+      }
+      const savedExperience = await Experience.findByIdAndUpdate(
+        id,
+        updatedExperience,
         {
-          $set: req.body,
-        },
-        { new: true }
+          new: true,
+        }
       );
-      res.status(200).json(updateExperience);
-    } else {
-      res.status(500).json('You can update only your experience!');
+      res.status(200).json(savedExperience);
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 //delete a post
 router.delete(
@@ -165,7 +188,7 @@ router.delete(
   authenticateUser,
   async (req, res, next) => {
     try {
-      console.log('deleting an experience for now');
+      // console.log('deleting an experience for now');
       const { id } = req.params;
       const experience = await Experience.findById(id);
       // console.log(experience);

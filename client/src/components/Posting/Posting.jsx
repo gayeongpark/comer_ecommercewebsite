@@ -152,6 +152,7 @@ export default function Posting() {
     formData.append('perks.food', perks.food);
     formData.append('perks.beverage', perks.beverage);
     formData.append('perks.alcohol', perks.alcohol);
+    formData.append('perks.transportation', perks.transportation);
     formData.append('perks.equipment', perks.equipment);
     formData.append('perks.others', perks.others);
     formData.append('minimumAge', Number(minimumAge));
