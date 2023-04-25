@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 
 export default function Comment({ comment }) {
@@ -7,16 +8,18 @@ export default function Comment({ comment }) {
   const [dateString, setDateString] = useState('');
   const [deleted, setDeleted] = useState(false);
 
+  const authUser = useSelector((state) => state.authUser.value);
+
   useEffect(() => {
     const fetchCommentOwner = async () => {
       if (!comment.userId) {
         throw new Error('Comment does not have an userId property.');
       }
-      const response = await axios.get(`/users/${comment.userId}`);
+      const response = await axios.get(`/users/comments/${comment.userId}`);
       setCommentOwner(response.data);
     };
     fetchCommentOwner();
-  }, [comment.userId]);
+  },[comment]);
 
   useEffect(() => {
     const now = new Date();
@@ -31,6 +34,8 @@ export default function Comment({ comment }) {
       setDateString(`${diff} days ago`);
     }
   }, [comment.createdAt]);
+
+  const isLoggedInUser = comment.userId === authUser.id;
 
   const handleDelete = async () => {
     try {
@@ -101,9 +106,11 @@ export default function Comment({ comment }) {
         <span className='text-sm'>{comment?.description}</span>
       </div>
       <div className='flex flex-col-reverse'>
-        <button onClick={handleDelete} className='text-red-600 ml-5'>
-          Delete
-        </button>
+        {isLoggedInUser && (
+          <button onClick={handleDelete} className='text-red-600 ml-5'>
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );

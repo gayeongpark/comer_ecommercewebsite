@@ -136,13 +136,13 @@ export default function Header() {
                   </span>
                   {openDate && (
                     <div className='z-40'>
-                    <DateRangePicker
-                      rangeColors={['#b91c1c']}
-                      onChange={(item) => setDate([item.selection])}
-                      minDate={new Date()}
-                      ranges={date}
-                      className='absolute top-16'
-                    />
+                      <DateRangePicker
+                        rangeColors={['#b91c1c']}
+                        onChange={(item) => setDate([item.selection])}
+                        minDate={new Date()}
+                        ranges={date}
+                        className='absolute top-16'
+                      />
                     </div>
                   )}
                 </div>

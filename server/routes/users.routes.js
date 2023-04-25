@@ -20,6 +20,21 @@ router.get('/:id', authenticateUser, async (req, res, next) => {
   }
 });
 
+//get user for comments
+router.get('/comments/:id', async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    // console.log(user)
+    if (!user) {
+      return res.status(404).json('User not found');
+    }
+    // console.log(user);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
 //update user
 
 //1. Defined a storage engine for Multer that specifies where uploaded files should be stored and what name they should be given.

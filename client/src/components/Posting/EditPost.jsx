@@ -15,7 +15,7 @@ const animatedComponents = makeAnimated();
 export default function EditPost() {
   const location = useLocation();
   const post = location.state.experience;
-  console.log('post', post);
+  // console.log('post', post);
 
   const [experienceInformation, setExperienceInformation] = useState('');
   const [error, setError] = useState('');
@@ -160,7 +160,7 @@ export default function EditPost() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
-    if (selectedFiles.length > 0) {
+    if (selectedFiles.length > 0 && previewUrls.length > 0) {
       for (let i = 0; i < selectedFiles.length; i++) {
         formData.append('files', selectedFiles[i]);
       }
@@ -186,10 +186,12 @@ export default function EditPost() {
     if (minimumAge) {
       formData.append('minimumAge', Number(minimumAge));
     }
-
-    formData.append('kidsAllowed', kidsAllowed);
-
-    formData.append('petsAllowed', petsAllowed);
+    if (kidsAllowed !== post.kidsAllowed) {
+      formData.append('kidsAllowed', kidsAllowed);
+    }
+    if (petsAllowed !== post.petsAllowed) {
+      formData.append('petsAllowed', petsAllowed);
+    }
 
     if (maxGuest) {
       formData.append('maxGuest', Number(maxGuest));
@@ -262,10 +264,12 @@ export default function EditPost() {
     if (notice) {
       formData.append('notice', notice);
     }
-
-    formData.append('cancellation1', cancellation1);
-
-    formData.append('cancellation2', cancellation2);
+    if (cancellation1 !== post.cancellation1) {
+      formData.append('cancellation1', cancellation1);
+    }
+    if (cancellation2 !== post.cancellation2) {
+      formData.append('cancellation2', cancellation2);
+    }
 
     if (formData.entries().next().done) {
       setSuccess('There is no change to update!');
@@ -295,6 +299,14 @@ export default function EditPost() {
 
   return (
     <div className='mx-auto mb-20 max-w-7xl px-4 sm:px-6 lg:px-8 overflow-hidden bg-white py-5 sm:rounded-lg'>
+      <div className='px-4 py-6'>
+        <p className='mt-1 max-w-2xl text-sm text-gray-500'>
+          * please click the save button for saving the details
+        </p>
+        <h3 className='mt-10 mb-5 text-3xl font-semibold leading-6 text-gray-900'>
+          Be a host
+        </h3>
+      </div>
       {/* image */}
       <div className='w-2/3'>
         <dl>
@@ -1079,20 +1091,35 @@ export default function EditPost() {
           <div className='px-4 py-10 border-b sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6'>
             <dt className='text-sm font-medium text-gray-500'>Tags</dt>
             <dd className='mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0'>
-              {experienceInformation?.experience?.tags?.map((tag, index) => (
-                <div
-                  key={index}
-                  className='inline-flex items-center justify-center py-1 px-2 bg-gray border rounded-full mr-2'
-                >
-                  <span className='mr-2'>{tag}</span>
-                  <span
-                    onClick={() => handleDeleteTag(index)}
-                    className='inline-flex items-center justify-center w-5 h-5 pb-1 border rounded-full bg-red-600 text-white text-lg cursor-pointer'
-                  >
-                    &times;
-                  </span>
-                </div>
-              ))}
+              {tags.length > 0
+                ? tags.map((tag, index) => (
+                    <div
+                      key={index}
+                      className='inline-flex items-center justify-center py-1 px-2 bg-gray border rounded-full mr-2'
+                    >
+                      <span className='mr-2'>{tag}</span>
+                      <span
+                        onClick={() => handleDeleteTag(index)}
+                        className='inline-flex items-center justify-center w-5 h-5 pb-1 border rounded-full bg-red-600 text-white text-lg cursor-pointer'
+                      >
+                        &times;
+                      </span>
+                    </div>
+                  ))
+                : experienceInformation?.experience?.tags?.map((tag, index) => (
+                    <div
+                      key={index}
+                      className='inline-flex items-center justify-center py-1 px-2 bg-gray border rounded-full mr-2'
+                    >
+                      <span className='mr-2'>{tag}</span>
+                      <span
+                        onClick={() => handleDeleteTag(index)}
+                        className='inline-flex items-center justify-center w-5 h-5 pb-1 border rounded-full bg-red-600 text-white text-lg cursor-pointer'
+                      >
+                        &times;
+                      </span>
+                    </div>
+                  ))}
             </dd>
             <div
               onClick={() => setOpenInputTags(!openInputTags)}
